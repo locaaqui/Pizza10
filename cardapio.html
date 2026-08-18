@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cardápio — Pizza10 | As Melhores Pizzas</title>
+  <meta name="description" content="Conheça o cardápio da Pizza10 — Pizzas artesanais, bebidas geladas e sobremesas irresistíveis. Faça seu pedido via WhatsApp!">
+  <meta name="robots" content="index, follow">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Cardápio — Pizza10">
+  <meta property="og:description" content="Pizzas artesanais premium com delivery. Confira nosso cardápio e peça pelo WhatsApp!">
+  <meta property="og:type" content="website">
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍕</text></svg>">
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <!-- Pizza10 Styles -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Supabase (for loading dynamic menu) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+
+  <!-- PUBLIC HEADER -->
+  <header class="public-header">
+    <a href="cardapio.html" class="brand">
+      <span class="brand-icon">🍕</span>
+      <h1>Pizza10</h1>
+    </a>
+    <div class="header-actions">
+      <a href="https://wa.me/5511999999999?text=Ol%C3%A1!%20Quero%20fazer%20um%20pedido!" target="_blank" class="btn btn-primary btn-sm">
+        <i class="fab fa-whatsapp"></i> Fazer Pedido
+      </a>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="menu-hero">
+    <h1>Nosso Cardápio</h1>
+    <p>Pizzas artesanais feitas com ingredientes selecionados. Escolha sua favorita e peça agora!</p>
+  </section>
+
+  <!-- CATEGORY TABS -->
+  <div class="menu-categories">
+    <button class="category-tab active" data-category="todos" onclick="filterCategory('todos')">
+      🍕 Todos
+    </button>
+    <button class="category-tab" data-category="tradicionais" onclick="filterCategory('tradicionais')">
+      🔴 Tradicionais
+    </button>
+    <button class="category-tab" data-category="especiais" onclick="filterCategory('especiais')">
+      ⭐ Especiais
+    </button>
+    <button class="category-tab" data-category="bebidas" onclick="filterCategory('bebidas')">
+      🥤 Bebidas
+    </button>
+    <button class="category-tab" data-category="sobremesas" onclick="filterCategory('sobremesas')">
+      🍫 Sobremesas
+    </button>
+  </div>
+
+  <!-- MENU GRID -->
+  <div class="menu-grid" id="menuGrid">
+    <div class="page-loader" style="grid-column: 1 / -1;">
+      <div class="spinner"></div>
+      <p>Carregando cardápio…</p>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="app-footer">
+    <p>🍕 Pizza10 &copy; 2026 — As Melhores Pizzas da Região</p>
+    <p style="margin-top:6px;">
+      <a href="https://wa.me/5511999999999" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+      &nbsp;•&nbsp;
+      <a href="index.html"><i class="fas fa-lock"></i> Área Admin</a>
+    </p>
+  </footer>
+
+  <!-- WhatsApp Float -->
+  <a href="https://wa.me/5511999999999?text=Ol%C3%A1!%20Vi%20o%20card%C3%A1pio%20e%20quero%20fazer%20um%20pedido!"
+     target="_blank" class="whatsapp-float" title="Fazer pedido pelo WhatsApp">
+    <i class="fab fa-whatsapp"></i>
+  </a>
+
+  <!-- Scripts -->
+  <script src="js/supabase-config.js"></script>
+  <script src="js/cardapio.js"></script>
+  <script>
+    // Load menu on page ready
+    loadMenu();
+  </script>
+
+</body>
+</html>

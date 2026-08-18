@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Pedidos — Pizza10</title>
+  <meta name="description" content="Gerenciamento de pedidos Pizza10 — Controle de status, delivery e entregas.">
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍕</text></svg>">
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <!-- Pizza10 Styles -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <style>
+    .filter-tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .filter-tab {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 30px;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-glass);
+      color: var(--text-secondary);
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition-fast);
+    }
+
+    .filter-tab:hover {
+      border-color: var(--border-hover);
+      color: var(--text-primary);
+    }
+
+    .filter-tab.active {
+      background: linear-gradient(135deg, var(--pizza-red), var(--pizza-orange));
+      border-color: transparent;
+      color: white;
+    }
+
+    .filter-tab .count {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 1px 7px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .filter-tab.active .count {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .pedidos-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .detail-item {
+      padding: 12px;
+      background: var(--bg-glass);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .detail-item .detail-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .detail-item .detail-value {
+      font-size: 14px;
+      color: var(--text-primary);
+    }
+
+    .detail-item.full {
+      grid-column: 1 / -1;
+    }
+
+    .detail-total {
+      text-align: center;
+      padding: 20px;
+      background: linear-gradient(135deg, rgba(229, 57, 53, 0.1), rgba(255, 111, 0, 0.1));
+      border: 1px solid rgba(229, 57, 53, 0.2);
+      border-radius: var(--radius);
+      margin-top: 16px;
+    }
+
+    .detail-total .label {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+
+    .detail-total .value {
+      font-family: var(--font-heading);
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--pizza-orange);
+    }
+  </style>
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="header-brand">
+      <span class="brand-icon">🍕</span>
+      <h1>Pizza10</h1>
+    </div>
+
+    <nav class="header-nav">
+      <a href="dashboard.html" id="navDashboard">
+        <i class="fas fa-chart-pie"></i> Dashboard
+      </a>
+      <a href="pedidos.html" class="active" id="navPedidos">
+        <i class="fas fa-receipt"></i> Pedidos
+      </a>
+      <a href="cardapio.html" id="navCardapio">
+        <i class="fas fa-utensils"></i> Cardápio
+      </a>
+    </nav>
+
+    <div class="header-user">
+      <span class="user-label" id="userLabel">
+        <i class="fas fa-user-circle"></i> Carregando…
+      </span>
+      <button class="btn-logout" id="logoutBtn">
+        <i class="fas fa-sign-out-alt"></i> Sair
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="app-main">
+    <div class="pedidos-toolbar">
+      <div>
+        <h2 class="page-title">Pedidos</h2>
+        <p class="page-subtitle" style="margin-bottom:0;">Gerencie todos os pedidos da pizzaria</p>
+      </div>
+      <button class="btn btn-primary" onclick="openNewOrderModal()">
+        <i class="fas fa-plus"></i> Novo Pedido
+      </button>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="filter-tabs">
+      <button class="filter-tab active" data-status="todos" onclick="setStatusFilter('todos')">
+        Todos <span class="count" id="count-todos">0</span>
+      </button>
+      <button class="filter-tab" data-status="novo" onclick="setStatusFilter('novo')">
+        <i class="fas fa-bell"></i> Novos <span class="count" id="count-novo">0</span>
+      </button>
+      <button class="filter-tab" data-status="preparando" onclick="setStatusFilter('preparando')">
+        <i class="fas fa-fire"></i> Preparando <span class="count" id="count-preparando">0</span>
+      </button>
+      <button class="filter-tab" data-status="entrega" onclick="setStatusFilter('entrega')">
+        <i class="fas fa-motorcycle"></i> Entrega <span class="count" id="count-entrega">0</span>
+      </button>
+      <button class="filter-tab" data-status="entregue" onclick="setStatusFilter('entregue')">
+        <i class="fas fa-check"></i> Entregues <span class="count" id="count-entregue">0</span>
+      </button>
+      <button class="filter-tab" data-status="cancelado" onclick="setStatusFilter('cancelado')">
+        <i class="fas fa-times"></i> Cancelados <span class="count" id="count-cancelado">0</span>
+      </button>
+    </div>
+
+    <!-- Search -->
+    <div class="search-input" style="margin-bottom:20px;">
+      <i class="fas fa-search"></i>
+      <input type="text" id="searchInput" placeholder="Buscar por cliente, telefone ou nº pedido…"
+             oninput="setSearchQuery(this.value)">
+    </div>
+
+    <!-- Orders Table -->
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th>Pedido</th>
+            <th>Cliente</th>
+            <th>Itens</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Data/Hora</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="ordersBody">
+          <tr>
+            <td colspan="7" style="text-align:center; padding:48px; color:var(--text-muted);">
+              <div class="spinner" style="margin:0 auto 12px;"></div>
+              <p>Carregando pedidos…</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- ORDER DETAIL MODAL -->
+  <div class="modal-overlay" id="orderDetailModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2><i class="fas fa-receipt" style="margin-right:8px; color:var(--pizza-orange);"></i> Pedido <span id="detailId">#0000</span></h2>
+        <button class="modal-close" onclick="closeOrderDetail()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="text-align:center; margin-bottom:20px;" id="detailStatus"></div>
+
+        <div class="detail-grid">
+          <div class="detail-item">
+            <div class="detail-label">Cliente</div>
+            <div class="detail-value" id="detailCliente">—</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Telefone</div>
+            <div class="detail-value" id="detailTelefone">—</div>
+          </div>
+          <div class="detail-item full">
+            <div class="detail-label">Endereço de Entrega</div>
+            <div class="detail-value" id="detailEndereco">—</div>
+          </div>
+          <div class="detail-item full">
+            <div class="detail-label">Itens do Pedido</div>
+            <div class="detail-value" id="detailItens">—</div>
+          </div>
+          <div class="detail-item full">
+            <div class="detail-label">Observações</div>
+            <div class="detail-value" id="detailObs">—</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Data/Hora</div>
+            <div class="detail-value" id="detailData">—</div>
+          </div>
+        </div>
+
+        <div class="detail-total">
+          <div class="label">Total do Pedido</div>
+          <div class="value" id="detailTotal">R$ 0,00</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeOrderDetail()">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEW ORDER MODAL -->
+  <div class="modal-overlay" id="newOrderModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2><i class="fas fa-plus-circle" style="margin-right:8px; color:var(--pizza-orange);"></i> Novo Pedido</h2>
+        <button class="modal-close" onclick="closeNewOrderModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="newOrderForm" onsubmit="event.preventDefault(); saveNewOrder();">
+          <div class="form-group">
+            <label>Nome do Cliente *</label>
+            <input type="text" id="noCliente" placeholder="Nome completo" required>
+          </div>
+          <div class="form-group">
+            <label>Telefone</label>
+            <input type="text" id="noTelefone" placeholder="(11) 99999-9999">
+          </div>
+          <div class="form-group">
+            <label>Endereço de Entrega</label>
+            <input type="text" id="noEndereco" placeholder="Rua, número, bairro">
+          </div>
+          <div class="form-group">
+            <label>Itens do Pedido *</label>
+            <textarea id="noItens" placeholder="Ex: 1x Margherita, 1x Coca-Cola" required></textarea>
+          </div>
+          <div class="form-group">
+            <label>Total (R$) *</label>
+            <input type="text" id="noTotal" placeholder="49,80" required>
+          </div>
+          <div class="form-group">
+            <label>Observações</label>
+            <textarea id="noObs" placeholder="Sem cebola, sem troco…"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeNewOrderModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveNewOrder()">
+          <i class="fas fa-check"></i> Criar Pedido
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="app-footer">
+    Pizza10 &copy; 2026 — Sistema de Gestão de Pizzaria
+  </footer>
+
+  <!-- TOAST -->
+  <div id="toast" class="toast"></div>
+
+  <!-- Scripts -->
+  <script src="js/supabase-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/pedidos.js"></script>
+  <script>
+    // Auth check + load orders
+    (async () => {
+      const session = await checkAuth(true);
+      if (session) {
+        await loadOrders();
+      }
+    })();
+
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', signOut);
+  </script>
+
+</body>
+</html>
