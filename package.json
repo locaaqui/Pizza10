@@ -1,0 +1,13 @@
+{
+  "name": "pizza10",
+  "version": "1.0.0",
+  "description": "Sistema de gestão de pizzaria com cardápio digital, pedidos online e painel administrativo",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["pizzaria", "delivery", "supabase", "pedidos"],
+  "author": "Pizza10",
+  "license": "ISC"
+}
