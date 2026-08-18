@@ -17,5 +17,7 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Scratch / temp
+# Scratch / temp / data exports
 scratch/
+data_export/
+test-*.ps1

@@ -2,7 +2,8 @@
 // Pizza10 — Cardápio (Menu) Module
 // ================================================================
 
-const MENU_TABLE = 'pizza10_cardapio';
+const MENU_TABLE = 'produtos_pizza10';
+const CATEGORIAS_TABLE = 'categorias_pizza10';
 
 // Default menu items (used if Supabase table doesn't exist yet)
 const DEFAULT_MENU = [

@@ -2,7 +2,7 @@
 // Pizza10 — Pedidos (Orders) Module
 // ================================================================
 
-const PEDIDOS_TABLE = 'pizza10_pedidos';
+const PEDIDOS_TABLE = 'pedidos_pizza10';
 
 let allOrders = [];
 let filteredOrders = [];

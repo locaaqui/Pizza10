@@ -2,7 +2,7 @@
 // Pizza10 — Dashboard Module
 // ================================================================
 
-const ORDERS_TABLE = 'pizza10_pedidos';
+const ORDERS_TABLE = 'pedidos_pizza10';
 
 let dashboardOrders = [];
 

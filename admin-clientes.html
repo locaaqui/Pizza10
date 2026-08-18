@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Clientes — Pizza10</title>
+  <meta name="description" content="Gestão e consulta de clientes da Pizza10 com histórico de pedidos e telefones.">
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍕</text></svg>">
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <!-- Pizza10 Styles -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <style>
+    .clients-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .clients-search-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .clients-search-bar .search-input {
+      flex: 1;
+      min-width: 280px;
+    }
+
+    .clients-search-bar .search-input input {
+      width: 100%;
+    }
+
+    .pagination-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-top: 1px solid var(--border-subtle);
+      font-size: 13px;
+      color: var(--text-secondary);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .pagination-controls {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .page-btn {
+      padding: 6px 12px;
+      background: var(--bg-glass);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-size: 13px;
+      cursor: pointer;
+      transition: var(--transition-fast);
+    }
+
+    .page-btn:hover:not(:disabled) {
+      background: var(--bg-input);
+      border-color: var(--pizza-orange);
+    }
+
+    .page-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .phone-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      background: rgba(255, 111, 0, 0.1);
+      border: 1px solid rgba(255, 111, 0, 0.2);
+      border-radius: 12px;
+      font-size: 12px;
+      color: var(--pizza-orange);
+      margin: 2px 0;
+      text-decoration: none;
+    }
+
+    .phone-tag:hover {
+      background: rgba(255, 111, 0, 0.2);
+      color: var(--pizza-yellow);
+    }
+  </style>
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="header-brand">
+      <span class="brand-icon">🍕</span>
+      <h1>Pizza10</h1>
+    </div>
+
+    <nav class="header-nav">
+      <a href="dashboard.html" id="navDashboard">
+        <i class="fas fa-chart-pie"></i> Dashboard
+      </a>
+      <a href="pedidos.html" id="navPedidos">
+        <i class="fas fa-receipt"></i> Pedidos
+      </a>
+      <a href="admin-clientes.html" class="active" id="navClientes">
+        <i class="fas fa-users"></i> Clientes
+      </a>
+      <a href="cardapio.html" id="navCardapio">
+        <i class="fas fa-utensils"></i> Cardápio
+      </a>
+    </nav>
+
+    <div class="header-user">
+      <span class="user-label" id="userLabel">
+        <i class="fas fa-user-circle"></i> Carregando…
+      </span>
+      <button class="btn-logout" id="logoutBtn">
+        <i class="fas fa-sign-out-alt"></i> Sair
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="app-main">
+    <div class="clients-toolbar">
+      <div>
+        <h2 class="page-title">Clientes</h2>
+        <p class="page-subtitle" style="margin-bottom:0;">
+          Consulta e gestão da base histórica de clientes • <span id="totalClientsCount">Carregando…</span>
+        </p>
+      </div>
+      <button class="btn btn-primary" onclick="openNewClientModal()">
+        <i class="fas fa-user-plus"></i> Novo Cliente
+      </button>
+    </div>
+
+    <!-- Search & Filter Bar -->
+    <div class="clients-search-bar">
+      <div class="search-input">
+        <i class="fas fa-search"></i>
+        <input type="text" id="clientSearchInput" placeholder="Buscar por nome, telefone, CPF/CNPJ, bairro ou endereço…"
+               oninput="onSearchChange(this.value)">
+      </div>
+
+      <div class="filter-bar" style="margin-bottom:0;">
+        <select id="cityFilter" onchange="onCityFilterChange(this.value)">
+          <option value="todos">Todas as Cidades</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Clients Table Card -->
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th>Cód.</th>
+            <th>Nome / Razão Social</th>
+            <th>Telefone(s)</th>
+            <th>Bairro / Cidade</th>
+            <th>Endereço</th>
+            <th>Consumo Total</th>
+            <th>Pedidos</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="clientsBody">
+          <tr>
+            <td colspan="8" style="text-align:center; padding:48px; color:var(--text-muted);">
+              <div class="spinner" style="margin:0 auto 12px;"></div>
+              <p>Carregando clientes do Supabase…</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Pagination -->
+      <div class="pagination-bar">
+        <div>
+          Mostrando <strong id="pageStart">0</strong>–<strong id="pageEnd">0</strong> de <strong id="totalFiltered">0</strong> clientes
+        </div>
+        <div class="pagination-controls">
+          <button class="page-btn" id="prevPageBtn" onclick="changePage(-1)">
+            <i class="fas fa-chevron-left"></i> Anterior
+          </button>
+          <span>Página <strong id="currentPageNum">1</strong> de <strong id="totalPagesNum">1</strong></span>
+          <button class="page-btn" id="nextPageBtn" onclick="changePage(1)">
+            Próxima <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- CLIENT DETAIL MODAL -->
+  <div class="modal-overlay" id="clientDetailModal">
+    <div class="modal-content" style="max-width:680px;">
+      <div class="modal-header">
+        <h2><i class="fas fa-user-circle" style="margin-right:8px; color:var(--pizza-orange);"></i> Ficha do Cliente <span id="detailCliId">#0000</span></h2>
+        <button class="modal-close" onclick="closeClientDetail()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="detail-grid">
+          <div class="detail-item full">
+            <div class="detail-label">Nome Completo / Razão Social</div>
+            <div class="detail-value" id="detailCliNome" style="font-weight:600; font-size:16px;">—</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Documento (CPF / CNPJ)</div>
+            <div class="detail-value" id="detailCliDoc">—</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">E-mail</div>
+            <div class="detail-value" id="detailCliEmail">—</div>
+          </div>
+          <div class="detail-item full">
+            <div class="detail-label">Telefones Cadastrados</div>
+            <div class="detail-value" id="detailCliPhones">—</div>
+          </div>
+          <div class="detail-item full">
+            <div class="detail-label">Endereço Completo</div>
+            <div class="detail-value" id="detailCliAddress">—</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Bairro</div>
+            <div class="detail-value" id="detailCliBairro">—</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Cidade / UF</div>
+            <div class="detail-value" id="detailCliCidade">—</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Total de Pedidos</div>
+            <div class="detail-value" id="detailCliQtdPed">0</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Consumo Total</div>
+            <div class="detail-value" id="detailCliConsumo" style="color:var(--pizza-orange); font-weight:700;">R$ 0,00</div>
+          </div>
+          <div class="detail-item full">
+            <div class="detail-label">Observações / Preferências</div>
+            <div class="detail-value" id="detailCliObs">—</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeClientDetail()">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEW CLIENT MODAL -->
+  <div class="modal-overlay" id="newClientModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2><i class="fas fa-user-plus" style="margin-right:8px; color:var(--pizza-orange);"></i> Novo Cliente</h2>
+        <button class="modal-close" onclick="closeNewClientModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="newClientForm" onsubmit="event.preventDefault(); saveNewClient();">
+          <div class="form-group">
+            <label>Nome Completo *</label>
+            <input type="text" id="ncNome" placeholder="Nome do cliente" required>
+          </div>
+          <div class="form-group">
+            <label>Telefone Principal *</label>
+            <input type="text" id="ncTelefone" placeholder="(11) 99999-9999" required>
+          </div>
+          <div class="form-group">
+            <label>CPF ou CNPJ</label>
+            <input type="text" id="ncDoc" placeholder="000.000.000-00">
+          </div>
+          <div class="form-group">
+            <label>CEP</label>
+            <input type="text" id="ncCep" placeholder="13200-000">
+          </div>
+          <div class="form-group">
+            <label>Endereço (Rua/Avenida)</label>
+            <input type="text" id="ncEndereco" placeholder="Rua das Flores">
+          </div>
+          <div class="form-group">
+            <label>Número e Complemento</label>
+            <input type="text" id="ncNumero" placeholder="123, Bloco A, Apto 4">
+          </div>
+          <div class="form-group">
+            <label>Bairro</label>
+            <input type="text" id="ncBairro" placeholder="Centro">
+          </div>
+          <div class="form-group">
+            <label>Cidade</label>
+            <input type="text" id="ncCidade" placeholder="Jundiaí" value="Jundiaí">
+          </div>
+          <div class="form-group">
+            <label>Observações</label>
+            <textarea id="ncObs" placeholder="Preferências, pontos de referência…"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeNewClientModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveNewClient()">
+          <i class="fas fa-save"></i> Salvar Cliente
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="app-footer">
+    Pizza10 &copy; 2026 — Sistema de Gestão de Pizzaria
+  </footer>
+
+  <!-- TOAST -->
+  <div id="toast" class="toast"></div>
+
+  <!-- Scripts -->
+  <script src="js/supabase-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    const CLIENTS_TABLE = 'clientes_pizza10';
+    let allClients = [];
+    let filteredClients = [];
+    let currentPage = 1;
+    const PAGE_SIZE = 50;
+    let currentSearch = '';
+    let currentCity = 'todos';
+
+    // Auth check + init
+    (async () => {
+      const session = await checkAuth(true);
+      if (session) {
+        await loadClients();
+      }
+    })();
+
+    document.getElementById('logoutBtn').addEventListener('click', signOut);
+
+    async function loadClients() {
+      try {
+        // Tenta buscar do Supabase
+        const { data, error } = await sb
+          .from(CLIENTS_TABLE)
+          .select('*')
+          .order('id', { ascending: false })
+          .limit(5000);
+
+        if (error) {
+          console.warn('Tabela clientes_pizza10 ainda não encontrada no Supabase:', error.message);
+          // Fallback: tentar tabela clientes padrão se existir
+          const { data: fallbackData } = await sb.from('clientes').select('*').limit(500);
+          allClients = fallbackData || [];
+        } else {
+          allClients = data || [];
+        }
+      } catch (e) {
+        console.error('Erro ao carregar clientes:', e);
+        allClients = [];
+      }
+
+      populateCityOptions();
+      applyClientFilters();
+      document.getElementById('totalClientsCount').textContent = `${allClients.length.toLocaleString('pt-BR')} registros carregados`;
+    }
+
+    function populateCityOptions() {
+      const select = document.getElementById('cityFilter');
+      const cities = [...new Set(allClients.map(c => c.cidade).filter(Boolean))].sort();
+      select.innerHTML = '<option value="todos">Todas as Cidades</option>' +
+        cities.map(c => `<option value="${c}">${c}</option>`).join('');
+    }
+
+    function onSearchChange(val) {
+      currentSearch = (val || '').toLowerCase().trim();
+      currentPage = 1;
+      applyClientFilters();
+    }
+
+    function onCityFilterChange(val) {
+      currentCity = val;
+      currentPage = 1;
+      applyClientFilters();
+    }
+
+    function applyClientFilters() {
+      filteredClients = allClients.filter(c => {
+        if (currentCity !== 'todos' && c.cidade !== currentCity) return false;
+        if (currentSearch) {
+          const q = currentSearch;
+          const matchNome = (c.nome || '').toLowerCase().includes(q) || (c.razao_social || '').toLowerCase().includes(q);
+          const matchTel = (c.telefone_principal || '').includes(q) || (JSON.stringify(c.telefones || '')).includes(q);
+          const matchDoc = (c.documento || '').includes(q);
+          const matchBairro = (c.bairro || '').toLowerCase().includes(q);
+          const matchEnd = (c.endereco || '').toLowerCase().includes(q);
+          const matchId = String(c.id).includes(q);
+          return matchNome || matchTel || matchDoc || matchBairro || matchEnd || matchId;
+        }
+        return true;
+      });
+
+      renderClientsTable();
+    }
+
+    function renderClientsTable() {
+      const tbody = document.getElementById('clientsBody');
+      if (!tbody) return;
+
+      const total = filteredClients.length;
+      const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+      if (currentPage > totalPages) currentPage = totalPages;
+
+      const startIdx = (currentPage - 1) * PAGE_SIZE;
+      const endIdx = Math.min(startIdx + PAGE_SIZE, total);
+      const pageRows = filteredClients.slice(startIdx, endIdx);
+
+      document.getElementById('pageStart').textContent = total > 0 ? (startIdx + 1) : 0;
+      document.getElementById('pageEnd').textContent = endIdx;
+      document.getElementById('totalFiltered').textContent = total.toLocaleString('pt-BR');
+      document.getElementById('currentPageNum').textContent = currentPage;
+      document.getElementById('totalPagesNum').textContent = totalPages;
+
+      document.getElementById('prevPageBtn').disabled = currentPage <= 1;
+      document.getElementById('nextPageBtn').disabled = currentPage >= totalPages;
+
+      if (pageRows.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" style="text-align:center; padding:48px; color:var(--text-muted);">
+              <i class="fas fa-users-slash" style="font-size:36px; display:block; margin-bottom:12px; opacity:0.3;"></i>
+              Nenhum cliente encontrado com os filtros atuais.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = pageRows.map(c => {
+        const phones = Array.isArray(c.telefones) ? c.telefones : (c.telefone_principal ? [c.telefone_principal] : []);
+        const phoneBadges = phones.slice(0, 2).map(p => {
+          const cleanPhone = String(p).replace(/\D/g, '');
+          return `<a href="https://wa.me/55${cleanPhone}" target="_blank" class="phone-tag" title="Abrir WhatsApp"><i class="fab fa-whatsapp"></i> ${p}</a>`;
+        }).join(' ');
+
+        const consumo = parseFloat(c.consumo_total || 0).toFixed(2).replace('.', ',');
+        const endFull = [c.endereco, c.numero, c.complemento].filter(Boolean).join(', ');
+
+        return `
+          <tr>
+            <td style="color:var(--text-primary); font-weight:600;">#${c.id}</td>
+            <td>
+              <div style="color:var(--text-primary); font-weight:500;">${c.nome || '—'}</div>
+              ${c.documento ? `<div style="font-size:12px; color:var(--text-muted);">Doc: ${c.documento}</div>` : ''}
+            </td>
+            <td>${phoneBadges || '—'}</td>
+            <td>${[c.bairro, c.cidade].filter(Boolean).join(' • ') || '—'}</td>
+            <td style="max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${endFull || '—'}</td>
+            <td style="color:var(--pizza-orange); font-weight:600;">R$ ${consumo}</td>
+            <td><span class="badge badge-new">${c.qtd_pedidos || 0}</span></td>
+            <td>
+              <button class="btn btn-sm btn-secondary" onclick="viewClientDetail(${c.id})" title="Ver ficha completa">
+                <i class="fas fa-id-card"></i> Ficha
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function changePage(delta) {
+      currentPage += delta;
+      renderClientsTable();
+      window.scrollTo({ top: 200, behavior: 'smooth' });
+    }
+
+    function viewClientDetail(id) {
+      const c = allClients.find(item => item.id === id);
+      if (!c) return;
+
+      document.getElementById('detailCliId').textContent = '#' + c.id;
+      document.getElementById('detailCliNome').textContent = c.nome || c.razao_social || '—';
+      document.getElementById('detailCliDoc').textContent = c.documento || c.rg_ie || 'Não informado';
+      document.getElementById('detailCliEmail').textContent = c.email || 'Não informado';
+
+      const phones = Array.isArray(c.telefones) ? c.telefones : (c.telefone_principal ? [c.telefone_principal] : []);
+      document.getElementById('detailCliPhones').innerHTML = phones.length > 0
+        ? phones.map(p => `<a href="https://wa.me/55${String(p).replace(/\D/g,'')}" target="_blank" class="phone-tag" style="margin-right:6px;"><i class="fab fa-whatsapp"></i> ${p}</a>`).join('')
+        : 'Nenhum telefone';
+
+      document.getElementById('detailCliAddress').textContent = [c.endereco, c.numero, c.complemento, c.cep ? `CEP: ${c.cep}` : ''].filter(Boolean).join(', ') || '—';
+      document.getElementById('detailCliBairro').textContent = c.bairro || '—';
+      document.getElementById('detailCliCidade').textContent = [c.cidade, c.estado].filter(Boolean).join(' / ') || '—';
+      document.getElementById('detailCliQtdPed').textContent = `${c.qtd_pedidos || 0} pedidos realizados`;
+      document.getElementById('detailCliConsumo').textContent = 'R$ ' + parseFloat(c.consumo_total || 0).toFixed(2).replace('.', ',');
+      document.getElementById('detailCliObs').textContent = c.observacao || 'Nenhuma observação cadastrada.';
+
+      document.getElementById('clientDetailModal').classList.add('active');
+    }
+
+    function closeClientDetail() {
+      document.getElementById('clientDetailModal').classList.remove('active');
+    }
+
+    function openNewClientModal() {
+      document.getElementById('newClientModal').classList.add('active');
+      document.getElementById('newClientForm').reset();
+    }
+
+    function closeNewClientModal() {
+      document.getElementById('newClientModal').classList.remove('active');
+    }
+
+    async function saveNewClient() {
+      const nome = document.getElementById('ncNome').value.trim();
+      const tel = document.getElementById('ncTelefone').value.trim();
+      const doc = document.getElementById('ncDoc').value.trim();
+      const cep = document.getElementById('ncCep').value.trim();
+      const end = document.getElementById('ncEndereco').value.trim();
+      const num = document.getElementById('ncNumero').value.trim();
+      const bairro = document.getElementById('ncBairro').value.trim();
+      const cidade = document.getElementById('ncCidade').value.trim();
+      const obs = document.getElementById('ncObs').value.trim();
+
+      if (!nome || !tel) {
+        showToast('Nome e telefone são obrigatórios.', 'error');
+        return;
+      }
+
+      try {
+        const newObj = {
+          nome,
+          telefone_principal: tel,
+          telefones: [tel],
+          documento: doc || null,
+          cep: cep || null,
+          endereco: end || null,
+          numero: num || null,
+          bairro: bairro || null,
+          cidade: cidade || 'Jundiaí',
+          estado: 'SP',
+          observacao: obs || null,
+          created_at: new Date().toISOString()
+        };
+
+        const { error } = await sb.from(CLIENTS_TABLE).insert(newObj);
+        if (error) throw error;
+
+        showToast('Cliente cadastrado com sucesso! 🍕', 'success');
+        closeNewClientModal();
+        await loadClients();
+      } catch (err) {
+        showToast('Erro ao salvar cliente: ' + err.message, 'error');
+      }
+    }
+  </script>
+
+</body>
+</html>
