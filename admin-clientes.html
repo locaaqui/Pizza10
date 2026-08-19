@@ -240,17 +240,28 @@
     </div>
 
     <!-- Search & Filter Bar -->
-    <div class="clients-search-bar">
-      <div class="search-input">
+    <div class="clients-search-bar" style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+      <div class="search-input" style="flex:1; min-width:260px;">
         <i class="fas fa-search"></i>
         <input type="text" id="clientSearchInput" placeholder="Buscar por nome, telefone, CPF/CNPJ, bairro ou endereço…"
                oninput="onSearchChange(this.value)">
       </div>
 
-      <div class="filter-bar" style="margin-bottom:0;">
+      <div class="filter-bar" style="margin-bottom:0; display:flex; gap:10px; align-items:center;">
         <select id="cityFilter" onchange="onCityFilterChange(this.value)">
           <option value="todos">Todas as Cidades</option>
         </select>
+
+        <div style="display:flex; align-items:center; gap:6px; background:var(--bg-glass); border:1px solid var(--border-subtle); border-radius:var(--radius); padding:4px 10px;">
+          <i class="fas fa-list-ol" style="color:var(--pizza-orange); font-size:13px;"></i>
+          <span style="font-size:13px; color:var(--text-secondary); white-space:nowrap;">Linhas:</span>
+          <select id="pageSizeSelect" onchange="onPageSizeChange(this.value)" style="background:transparent; border:none; color:var(--text-primary); font-size:13px; font-weight:600; cursor:pointer; outline:none; padding:2px 4px;">
+            <option value="20" selected>20 por página</option>
+            <option value="50">50 por página</option>
+            <option value="100">100 por página</option>
+            <option value="200">200 por página</option>
+          </select>
+        </div>
       </div>
     </div>
 
@@ -506,7 +517,7 @@
     let allClients = [];
     let filteredClients = [];
     let currentPage = 1;
-    const PAGE_SIZE = 50;
+    let PAGE_SIZE = 20; // Padrão: 20 linhas por página
     let currentSearch = '';
     let currentCity = 'todos';
 
@@ -544,7 +555,18 @@
 
       populateCityOptions();
       applyClientFilters();
-      document.getElementById('totalClientsCount').textContent = `${allClients.length.toLocaleString('pt-BR')} registros carregados`;
+      updateClientsCountLabel();
+    }
+
+    function updateClientsCountLabel() {
+      document.getElementById('totalClientsCount').textContent = `${allClients.length.toLocaleString('pt-BR')} registros carregados (exibindo ${PAGE_SIZE} por página)`;
+    }
+
+    function onPageSizeChange(val) {
+      PAGE_SIZE = parseInt(val) || 20;
+      currentPage = 1;
+      updateClientsCountLabel();
+      renderClientsTable();
     }
 
     function populateCityOptions() {
