@@ -151,7 +151,7 @@ function renderOrders() {
           <div style="font-size:12px; color:var(--text-muted);">${order.cliente_telefone || ''}</div>
         </td>
         <td>${order.itens_resumo || '—'}</td>
-        <td style="color:var(--pizza-orange); font-weight:600;">R$ ${parseFloat(order.total || 0).toFixed(2).replace('.', ',')}</td>
+        <td style="color:var(--pizza-orange); font-weight:600;">R$ ${parseFloat(order.total_pedido || order.total || 0).toFixed(2).replace('.', ',')}</td>
         <td><span class="badge ${s.class}"><i class="fas ${s.icon}"></i> ${s.label}</span></td>
         <td style="color:var(--text-muted);">${dateStr} ${timeStr}</td>
         <td>
@@ -211,11 +211,11 @@ function viewOrderDetail(orderId) {
   document.getElementById('detailId').textContent = '#' + String(order.id).padStart(4, '0');
   document.getElementById('detailCliente').textContent = order.cliente_nome || '—';
   document.getElementById('detailTelefone').textContent = order.cliente_telefone || '—';
-  document.getElementById('detailEndereco').textContent = order.endereco || '—';
+  document.getElementById('detailEndereco').textContent = order.endereco_entrega || order.endereco || '—';
   document.getElementById('detailItens').textContent = order.itens_resumo || '—';
-  document.getElementById('detailObs').textContent = order.observacoes || 'Nenhuma';
-  document.getElementById('detailTotal').textContent = 'R$ ' + parseFloat(order.total || 0).toFixed(2).replace('.', ',');
-  document.getElementById('detailData').textContent = new Date(order.created_at).toLocaleString('pt-BR');
+  document.getElementById('detailObs').textContent = order.observacao || order.observacoes || 'Nenhuma';
+  document.getElementById('detailTotal').textContent = 'R$ ' + parseFloat(order.total_pedido || order.total || 0).toFixed(2).replace('.', ',');
+  document.getElementById('detailData').textContent = new Date(order.data_pedido || order.created_at).toLocaleString('pt-BR');
 
   const statusMap = {
     novo: { label: 'Novo', class: 'badge-new' },
