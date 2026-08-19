@@ -534,7 +534,7 @@
       container.innerHTML = `
         <div style="text-align:center; padding:32px; color:var(--text-muted);">
           <div class="spinner" style="margin:0 auto 12px;"></div>
-          <p>Buscando histórico de pedidos do cliente...</p>
+          <p>Buscando histórico e itens dos pedidos...</p>
         </div>
       `;
 
@@ -558,11 +558,27 @@
 
         document.getElementById('badgeTotalPedCli').textContent = orders.length;
 
+        // Busca todos os itens desses pedidos na tabela pedidos_itens_pizza10
+        const orderIds = orders.map(o => o.id);
+        const { data: itemsData } = await sb
+          .from('pedidos_itens_pizza10')
+          .select('*')
+          .in('pedido_id', orderIds);
+
+        // Agrupa os itens por pedido_id e por item_codigo para montar pizzas meio-a-meio
+        const itemsByOrder = {};
+        if (itemsData && itemsData.length > 0) {
+          itemsData.forEach(item => {
+            if (!itemsByOrder[item.pedido_id]) itemsByOrder[item.pedido_id] = [];
+            itemsByOrder[item.pedido_id].push(item);
+          });
+        }
+
         container.innerHTML = `
           <div style="margin-bottom:12px; font-size:13px; color:var(--text-secondary);">
             Total de <strong>${orders.length} pedidos</strong> encontrados no histórico:
           </div>
-          <div style="display:flex; flex-direction:column; gap:12px; max-height:420px; overflow-y:auto; padding-right:4px;">
+          <div style="display:flex; flex-direction:column; gap:14px; max-height:450px; overflow-y:auto; padding-right:4px;">
             ${orders.map(order => {
               const dt = new Date(order.data_pedido || order.created_at);
               const dtStr = dt.toLocaleDateString('pt-BR') + ' às ' + dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
@@ -578,25 +594,99 @@
               };
               const s = statusMap[order.status] || statusMap.entregue;
 
+              // Processa os itens do pedido
+              const rawItems = itemsByOrder[order.id] || [];
+              let itemsHtml = '';
+              let itemsTextSummary = '';
+
+              if (rawItems.length > 0) {
+                // Agrupa frações de pizza pelo mesmo item_codigo
+                const groupedByCode = {};
+                rawItems.forEach(it => {
+                  const key = it.item_codigo || it.id;
+                  if (!groupedByCode[key]) groupedByCode[key] = [];
+                  groupedByCode[key].push(it);
+                });
+
+                const formattedLines = [];
+                Object.values(groupedByCode).forEach(group => {
+                  // Filtra itens não vazios
+                  const validParts = group.filter(p => p.descricao && p.descricao.trim() !== '');
+                  if (validParts.length === 0) return;
+
+                  if (validParts.length > 1) {
+                    // Pizza meio-a-meio ou 3 sabores
+                    const flavorNames = validParts.map(p => {
+                      const frac = p.quantidade == 0.5 ? '1/2' : (p.quantidade == 0.333 ? '1/3' : (p.quantidade == 0.25 ? '1/4' : `${p.quantidade}x`));
+                      return `${frac} ${p.descricao}`;
+                    }).join(' + ');
+                    const price = Math.max(...validParts.map(p => parseFloat(p.preco_total || p.preco_unitario || 0)));
+                    const obsList = validParts.map(p => p.observacao).filter(Boolean).join(' | ');
+
+                    formattedLines.push({
+                      title: `🍕 1x Pizza (${flavorNames})`,
+                      price: price > 0 ? `R$ ${price.toFixed(2).replace('.', ',')}` : '',
+                      obs: obsList
+                    });
+                  } else {
+                    const single = validParts[0];
+                    const qtd = parseFloat(single.quantidade || 1);
+                    const isPizza = !single.descricao.toLowerCase().includes('coca') && !single.descricao.toLowerCase().includes('guarana') && !single.descricao.toLowerCase().includes('agua') && !single.descricao.toLowerCase().includes('cerveja') && !single.descricao.toLowerCase().includes('suco');
+                    const icon = isPizza ? '🍕' : '🥤';
+                    const price = parseFloat(single.preco_total || single.preco_unitario || 0);
+
+                    formattedLines.push({
+                      title: `${icon} ${qtd}x ${single.descricao}`,
+                      price: price > 0 ? `R$ ${price.toFixed(2).replace('.', ',')}` : '',
+                      obs: single.observacao || ''
+                    });
+                  }
+                });
+
+                itemsTextSummary = formattedLines.map(f => f.title).join(', ');
+
+                itemsHtml = `
+                  <div style="background:rgba(0,0,0,0.35); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:10px 14px; margin-bottom:12px;">
+                    <div style="font-size:11px; font-weight:700; color:var(--pizza-orange); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">
+                      <i class="fas fa-utensils"></i> Itens do Pedido:
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:6px;">
+                      ${formattedLines.map(f => `
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; font-size:13px; color:var(--text-primary);">
+                          <div>
+                            <span style="font-weight:600;">${f.title}</span>
+                            ${f.obs ? `<div style="font-size:11px; color:var(--text-muted); margin-left:18px;"><i class="fas fa-comment-dots"></i> ${f.obs}</div>` : ''}
+                          </div>
+                          ${f.price ? `<span style="font-weight:600; color:var(--text-secondary); margin-left:12px;">${f.price}</span>` : ''}
+                        </div>
+                      `).join('')}
+                    </div>
+                  </div>
+                `;
+              } else if (order.itens_resumo) {
+                itemsTextSummary = order.itens_resumo;
+                itemsHtml = `
+                  <div style="background:rgba(0,0,0,0.35); border-radius:var(--radius-sm); padding:10px 12px; margin-bottom:12px; font-size:13px; color:var(--text-primary);">
+                    <i class="fas fa-utensils" style="color:var(--pizza-orange); margin-right:6px;"></i>
+                    <strong>Itens:</strong> ${order.itens_resumo}
+                  </div>
+                `;
+              }
+
               return `
                 <div style="background:var(--bg-glass); border:1px solid var(--border-subtle); border-radius:var(--radius); padding:16px; transition:var(--transition-fast);">
-                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
                     <div>
                       <strong style="color:var(--text-primary); font-size:15px;">Pedido #${order.id}</strong>
                       <span style="font-size:12px; color:var(--text-muted); margin-left:8px;"><i class="fas fa-calendar-alt"></i> ${dtStr}</span>
                     </div>
-                    <div>
+                    <div style="display:flex; align-items:center; gap:10px;">
                       <span class="badge ${s.class}"><i class="fas ${s.icon}"></i> ${s.label}</span>
-                      <strong style="color:var(--pizza-orange); font-size:16px; margin-left:12px;">R$ ${tot}</strong>
+                      <strong style="color:var(--pizza-orange); font-size:17px;">R$ ${tot}</strong>
                     </div>
                   </div>
 
-                  ${order.itens_resumo ? `
-                    <div style="background:rgba(0,0,0,0.25); border-radius:var(--radius-sm); padding:10px 12px; margin-bottom:10px; font-size:13px; color:var(--text-primary);">
-                      <i class="fas fa-utensils" style="color:var(--pizza-orange); margin-right:6px;"></i>
-                      <strong>Itens:</strong> ${order.itens_resumo}
-                    </div>
-                  ` : ''}
+                  ${itemsHtml}
 
                   <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; color:var(--text-muted); flex-wrap:wrap; gap:8px;">
                     <div>
@@ -604,8 +694,8 @@
                       ${parseFloat(taxa) > 0 ? `<span style="margin-left:10px;"><i class="fas fa-motorcycle"></i> Taxa: R$ ${taxa}</span>` : ''}
                       ${order.atendente ? `<span style="margin-left:10px;"><i class="fas fa-user-tag"></i> Atendente: ${order.atendente}</span>` : ''}
                     </div>
-                    <button class="btn btn-sm btn-secondary" style="padding:4px 10px; font-size:11px;"
-                            onclick="reorderItems('${encodeURIComponent(order.itens_resumo || '')}', '${encodeURIComponent(order.cliente_nome || '')}', '${encodeURIComponent(order.cliente_telefone || '')}')">
+                    <button class="btn btn-sm btn-secondary" style="padding:5px 12px; font-size:12px;"
+                            onclick="reorderItems('${encodeURIComponent(itemsTextSummary)}', '${encodeURIComponent(order.cliente_nome || '')}', '${encodeURIComponent(order.cliente_telefone || '')}')">
                       <i class="fas fa-redo"></i> Repetir Pedido
                     </button>
                   </div>
