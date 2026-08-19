@@ -472,7 +472,7 @@ try {
         $dtItem = if ($reader["Data"] -ne [DBNull]::Value) { ([datetime]$reader["Data"]).ToString("yyyy-MM-ddTHH:mm:ssZ") } else { $null }
 
         $itemObj = @{
-            id             = [long]$reader["Codigo"]
+            item_codigo    = [int]$reader["Codigo"]
             pedido_id      = [int]$reader["Pedido"]
             produto_id     = if ($reader["Produto"] -ne [DBNull]::Value) { [int]$reader["Produto"] } else { $null }
             descricao      = $desc.Trim()

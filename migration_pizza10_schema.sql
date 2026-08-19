@@ -101,10 +101,12 @@ CREATE TABLE IF NOT EXISTS public.pedidos_pizza10 (
 -- ------------------------------------------------------------------------------
 -- 5. TABELA: pedidos_itens_pizza10
 -- ------------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS public.pedidos_itens_pizza10 (
-    id BIGINT PRIMARY KEY,
-    pedido_id INTEGER NOT NULL REFERENCES public.pedidos_pizza10(id) ON DELETE CASCADE,
-    produto_id INTEGER REFERENCES public.produtos_pizza10(id) ON DELETE SET NULL,
+DROP TABLE IF EXISTS public.pedidos_itens_pizza10 CASCADE;
+CREATE TABLE public.pedidos_itens_pizza10 (
+    id BIGSERIAL PRIMARY KEY,
+    item_codigo INTEGER, -- Codigo original do item no SQL Server
+    pedido_id INTEGER NOT NULL,
+    produto_id INTEGER,
     descricao VARCHAR(255) NOT NULL,
     quantidade NUMERIC(10, 3) NOT NULL DEFAULT 1,
     preco_unitario NUMERIC(10, 2) NOT NULL DEFAULT 0.00,
