@@ -349,6 +349,7 @@ try {
         p.Observacao, p.Complemento_Cliente
     FROM Tab_Vnd_Pedidos p
     LEFT JOIN Tab_Cad_Clientes c ON p.CodCliente = c.Codigo
+    WHERE (p.CodCliente IS NOT NULL OR (c.RazaoSocial IS NOT NULL AND c.RazaoSocial <> '') OR p.Total_Pedido > 0)
     ORDER BY p.Pedido
 "@
     $reader = $cmd.ExecuteReader()
