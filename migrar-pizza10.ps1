@@ -207,17 +207,22 @@ try {
     }
     Write-Host " ($($dtPhones.Rows.Count) números mapeados)" -ForegroundColor Gray
 
-    # Extrair clientes
-    Write-Host " Carregando 47.361 clientes do SQL Server..." -NoNewline
+    # Extrair clientes com JOIN em Bairros e Municípios para endereço 100% completo
+    Write-Host " Carregando 47.361 clientes com bairros e cidades do SQL Server..." -NoNewline
     $cmd = $conn.CreateCommand()
     $cmd.CommandText = @"
     SELECT 
-        Codigo, RazaoSocial, Resumido, CGC, CPFCNPJ_Num, Inscricao, Telefones, EMail,
-        CEP, Endereco, Endereco_Numero, Endereco_Complemento, Bairrox, Cidadex, Estado,
-        Observacao, Preferencia, Limite_de_Credito, Consumo_Total, Qtd_Pedidos,
-        Data_Ultimo_Pedido, Inativo, Cadastro, TimeStampx
-    FROM Tab_Cad_Clientes
-    ORDER BY Codigo
+        c.Codigo, c.RazaoSocial, c.Resumido, c.Contato, c.CGC, c.CPFCNPJ_Num, c.Inscricao, c.Telefones, c.EMail,
+        c.CEP, c.Endereco, c.Endereco_Numero, c.Endereco_Complemento,
+        COALESCE(c.Bairrox, b.Bairro) AS BairroResolvido,
+        COALESCE(c.Cidadex, m.Municipio, 'Itatiba') AS CidadeResolvida,
+        c.Estado,
+        c.Observacao, c.Preferencia, c.Limite_de_Credito, c.Consumo_Total, c.Qtd_Pedidos,
+        c.Data_Ultimo_Pedido, c.Inativo, c.Cadastro, c.TimeStampx
+    FROM Tab_Cad_Clientes c
+    LEFT JOIN Tab_Cad_Bairros b ON c.Cod_Bairro = b.Codigo
+    LEFT JOIN Tab_Cad_Municipios m ON c.CodMunicipio = m.Codigo
+    ORDER BY c.Codigo
 "@
     $adapter = New-Object System.Data.SqlClient.SqlDataAdapter($cmd)
     $dtCli = New-Object System.Data.DataTable
@@ -235,9 +240,18 @@ try {
         $r = $dtCli.Rows[$i]
         $cId = [int]$r["Codigo"]
 
-        $nome = [string]$r["RazaoSocial"]
-        if ([string]::IsNullOrWhiteSpace($nome)) {
-            $nome = [string]$r["Resumido"]
+        $razao = [string]$r["RazaoSocial"]
+        $resumido = [string]$r["Resumido"]
+        $contato = [string]$r["Contato"]
+
+        # Trata nomes vazios ou "cliente" genérico
+        $nome = $razao
+        if ([string]::IsNullOrWhiteSpace($nome) -or $nome.Trim().ToLower() -eq "cliente") {
+            if (-not [string]::IsNullOrWhiteSpace($contato) -and $contato.Trim().ToLower() -ne "cliente") {
+                $nome = $contato
+            } elseif (-not [string]::IsNullOrWhiteSpace($resumido) -and $resumido.Trim().ToLower() -ne "cliente") {
+                $nome = $resumido
+            }
         }
         if ([string]::IsNullOrWhiteSpace($nome)) {
             $nome = "Cliente #$cId"
@@ -279,6 +293,10 @@ try {
         $dataCad = if ($r["Cadastro"] -ne [DBNull]::Value) { ([datetime]$r["Cadastro"]).ToString("yyyy-MM-ddTHH:mm:ssZ") } else { $null }
         $dataUpd = if ($r["TimeStampx"] -ne [DBNull]::Value) { ([datetime]$r["TimeStampx"]).ToString("yyyy-MM-ddTHH:mm:ssZ") } else { $null }
 
+        $bairro = if ($r["BairroResolvido"] -ne [DBNull]::Value) { ([string]$r["BairroResolvido"]).Trim() } else { $null }
+        $cidade = if ($r["CidadeResolvida"] -ne [DBNull]::Value) { ([string]$r["CidadeResolvida"]).Trim() } else { "Itatiba" }
+        $estado = if ($r["Estado"] -ne [DBNull]::Value -and [string]$r["Estado"] -ne "") { ([string]$r["Estado"]).Trim() } else { "SP" }
+
         $cliObj = @{
             id                 = $cId
             nome               = $nome.Trim()
@@ -293,9 +311,9 @@ try {
             endereco           = if ($r["Endereco"] -ne [DBNull]::Value) { ([string]$r["Endereco"]).Trim() } else { $null }
             numero             = if ($r["Endereco_Numero"] -ne [DBNull]::Value) { ([string]$r["Endereco_Numero"]).Trim() } else { $null }
             complemento        = if ($r["Endereco_Complemento"] -ne [DBNull]::Value) { ([string]$r["Endereco_Complemento"]).Trim() } else { $null }
-            bairro             = if ($r["Bairrox"] -ne [DBNull]::Value) { ([string]$r["Bairrox"]).Trim() } else { $null }
-            cidade             = if ($r["Cidadex"] -ne [DBNull]::Value) { ([string]$r["Cidadex"]).Trim() } else { $null }
-            estado             = if ($r["Estado"] -ne [DBNull]::Value) { ([string]$r["Estado"]).Trim() } else { "SP" }
+            bairro             = $bairro
+            cidade             = $cidade
+            estado             = $estado
             observacao         = if (-not [string]::IsNullOrWhiteSpace($obs)) { $obs.Trim() } else { $null }
             limite_credito     = [math]::Round($limite, 2)
             consumo_total      = [math]::Round($consumo, 2)
