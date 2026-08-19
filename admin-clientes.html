@@ -98,32 +98,76 @@
       text-decoration: none;
     }
 
-    .copy-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 3px 8px;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-sm);
-      color: var(--text-muted);
-      font-size: 11px;
-      cursor: pointer;
-      transition: var(--transition-fast);
-      margin-left: auto;
+    .detail-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: var(--radius);
+      overflow: hidden;
     }
 
-    .copy-btn:hover {
-      background: rgba(255, 111, 0, 0.15);
-      border-color: var(--pizza-orange);
-      color: var(--pizza-orange);
+    .detail-item {
+      padding: 12px 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15); /* Linha branca 1px separando cada dado */
+      transition: var(--transition-fast);
+      background: transparent;
+    }
+
+    .detail-item:last-child {
+      border-bottom: none;
+    }
+
+    .detail-item:hover {
+      background: rgba(255, 255, 255, 0.03);
     }
 
     .detail-item-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
+    }
+
+    .detail-item .detail-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .detail-item .detail-value {
+      font-size: 14px;
+      color: var(--text-primary);
+      margin-top: 2px;
+    }
+
+    .copy-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition-fast);
+      margin-left: auto;
+    }
+
+    .copy-btn:hover {
+      background: rgba(255, 111, 0, 0.2);
+      border-color: var(--pizza-orange);
+      color: var(--pizza-orange);
+      transform: translateY(-1px);
     }
 
     .detail-section-title {
@@ -133,9 +177,9 @@
       font-size: 15px;
       font-weight: 700;
       color: var(--text-primary);
-      margin: 24px 0 14px;
-      padding-top: 18px;
-      border-top: 1px solid var(--border-subtle);
+      margin: 28px 0 16px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.2); /* Linha branca 1px separando os pedidos */
     }
 
     .detail-section-title i {
