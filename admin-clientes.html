@@ -221,47 +221,69 @@
         <h2><i class="fas fa-user-circle" style="margin-right:8px; color:var(--pizza-orange);"></i> Ficha do Cliente <span id="detailCliId">#0000</span></h2>
         <button class="modal-close" onclick="closeClientDetail()">&times;</button>
       </div>
-      <div class="modal-body">
-        <div class="detail-grid">
-          <div class="detail-item full">
-            <div class="detail-label">Nome Completo / Razão Social</div>
-            <div class="detail-value" id="detailCliNome" style="font-weight:600; font-size:16px;">—</div>
+        <!-- Modal Navigation Tabs -->
+        <div style="display:flex; gap:8px; margin-bottom:20px; border-bottom:1px solid var(--border-subtle); padding-bottom:12px;">
+          <button class="filter-tab active" id="tabCliDados" onclick="switchCliTab('dados')">
+            <i class="fas fa-id-card"></i> Dados Cadastrais
+          </button>
+          <button class="filter-tab" id="tabCliHistorico" onclick="switchCliTab('historico')">
+            <i class="fas fa-history"></i> Histórico de Pedidos <span class="count" id="badgeTotalPedCli">0</span>
+          </button>
+        </div>
+
+        <!-- TAB 1: DADOS CADASTRAIS -->
+        <div id="cliTabContentDados">
+          <div class="detail-grid">
+            <div class="detail-item full">
+              <div class="detail-label">Nome Completo / Razão Social</div>
+              <div class="detail-value" id="detailCliNome" style="font-weight:600; font-size:16px;">—</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Documento (CPF / CNPJ)</div>
+              <div class="detail-value" id="detailCliDoc">—</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">E-mail</div>
+              <div class="detail-value" id="detailCliEmail">—</div>
+            </div>
+            <div class="detail-item full">
+              <div class="detail-label">Telefones Cadastrados</div>
+              <div class="detail-value" id="detailCliPhones">—</div>
+            </div>
+            <div class="detail-item full">
+              <div class="detail-label">Endereço Completo</div>
+              <div class="detail-value" id="detailCliAddress">—</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Bairro</div>
+              <div class="detail-value" id="detailCliBairro">—</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Cidade / UF</div>
+              <div class="detail-value" id="detailCliCidade">—</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Total de Pedidos</div>
+              <div class="detail-value" id="detailCliQtdPed">0</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Consumo Total Histórico</div>
+              <div class="detail-value" id="detailCliConsumo" style="color:var(--pizza-orange); font-weight:700;">R$ 0,00</div>
+            </div>
+            <div class="detail-item full">
+              <div class="detail-label">Observações / Preferências</div>
+              <div class="detail-value" id="detailCliObs">—</div>
+            </div>
           </div>
-          <div class="detail-item">
-            <div class="detail-label">Documento (CPF / CNPJ)</div>
-            <div class="detail-value" id="detailCliDoc">—</div>
-          </div>
-          <div class="detail-item">
-            <div class="detail-label">E-mail</div>
-            <div class="detail-value" id="detailCliEmail">—</div>
-          </div>
-          <div class="detail-item full">
-            <div class="detail-label">Telefones Cadastrados</div>
-            <div class="detail-value" id="detailCliPhones">—</div>
-          </div>
-          <div class="detail-item full">
-            <div class="detail-label">Endereço Completo</div>
-            <div class="detail-value" id="detailCliAddress">—</div>
-          </div>
-          <div class="detail-item">
-            <div class="detail-label">Bairro</div>
-            <div class="detail-value" id="detailCliBairro">—</div>
-          </div>
-          <div class="detail-item">
-            <div class="detail-label">Cidade / UF</div>
-            <div class="detail-value" id="detailCliCidade">—</div>
-          </div>
-          <div class="detail-item">
-            <div class="detail-label">Total de Pedidos</div>
-            <div class="detail-value" id="detailCliQtdPed">0</div>
-          </div>
-          <div class="detail-item">
-            <div class="detail-label">Consumo Total</div>
-            <div class="detail-value" id="detailCliConsumo" style="color:var(--pizza-orange); font-weight:700;">R$ 0,00</div>
-          </div>
-          <div class="detail-item full">
-            <div class="detail-label">Observações / Preferências</div>
-            <div class="detail-value" id="detailCliObs">—</div>
+        </div>
+
+        <!-- TAB 2: HISTÓRICO DE PEDIDOS -->
+        <div id="cliTabContentHistorico" style="display:none;">
+          <div id="cliOrdersContainer">
+            <div style="text-align:center; padding:32px; color:var(--text-muted);">
+              <div class="spinner" style="margin:0 auto 12px;"></div>
+              <p>Carregando histórico completo de pedidos…</p>
+            </div>
           </div>
         </div>
       </div>
@@ -493,9 +515,129 @@
       window.scrollTo({ top: 200, behavior: 'smooth' });
     }
 
+    let activeCliId = null;
+
+    function switchCliTab(tab) {
+      const isDados = tab === 'dados';
+      document.getElementById('tabCliDados').classList.toggle('active', isDados);
+      document.getElementById('tabCliHistorico').classList.toggle('active', !isDados);
+      document.getElementById('cliTabContentDados').style.display = isDados ? 'block' : 'none';
+      document.getElementById('cliTabContentHistorico').style.display = isDados ? 'none' : 'block';
+
+      if (!isDados && activeCliId) {
+        loadClientOrders(activeCliId);
+      }
+    }
+
+    async function loadClientOrders(clientId) {
+      const container = document.getElementById('cliOrdersContainer');
+      container.innerHTML = `
+        <div style="text-align:center; padding:32px; color:var(--text-muted);">
+          <div class="spinner" style="margin:0 auto 12px;"></div>
+          <p>Buscando histórico de pedidos do cliente...</p>
+        </div>
+      `;
+
+      try {
+        // Busca pedidos do cliente no Supabase
+        const { data: orders, error } = await sb
+          .from('pedidos_pizza10')
+          .select('*')
+          .eq('cliente_id', clientId)
+          .order('data_pedido', { ascending: false });
+
+        if (error || !orders || orders.length === 0) {
+          container.innerHTML = `
+            <div style="text-align:center; padding:36px; color:var(--text-muted);">
+              <i class="fas fa-pizza-slice" style="font-size:32px; display:block; margin-bottom:10px; opacity:0.3;"></i>
+              <p>Nenhum pedido registrado no sistema para este cliente.</p>
+            </div>
+          `;
+          return;
+        }
+
+        document.getElementById('badgeTotalPedCli').textContent = orders.length;
+
+        container.innerHTML = `
+          <div style="margin-bottom:12px; font-size:13px; color:var(--text-secondary);">
+            Total de <strong>${orders.length} pedidos</strong> encontrados no histórico:
+          </div>
+          <div style="display:flex; flex-direction:column; gap:12px; max-height:420px; overflow-y:auto; padding-right:4px;">
+            ${orders.map(order => {
+              const dt = new Date(order.data_pedido || order.created_at);
+              const dtStr = dt.toLocaleDateString('pt-BR') + ' às ' + dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+              const tot = parseFloat(order.total_pedido || order.total || 0).toFixed(2).replace('.', ',');
+              const taxa = parseFloat(order.taxa_entrega || 0).toFixed(2).replace('.', ',');
+
+              const statusMap = {
+                novo: { label: 'Novo', class: 'badge-new', icon: 'fa-bell' },
+                preparando: { label: 'Preparando', class: 'badge-preparing', icon: 'fa-fire' },
+                entrega: { label: 'Em Entrega', class: 'badge-delivering', icon: 'fa-motorcycle' },
+                entregue: { label: 'Entregue', class: 'badge-delivered', icon: 'fa-check' },
+                cancelado: { label: 'Cancelado', class: 'badge-cancelled', icon: 'fa-times' }
+              };
+              const s = statusMap[order.status] || statusMap.entregue;
+
+              return `
+                <div style="background:var(--bg-glass); border:1px solid var(--border-subtle); border-radius:var(--radius); padding:16px; transition:var(--transition-fast);">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
+                    <div>
+                      <strong style="color:var(--text-primary); font-size:15px;">Pedido #${order.id}</strong>
+                      <span style="font-size:12px; color:var(--text-muted); margin-left:8px;"><i class="fas fa-calendar-alt"></i> ${dtStr}</span>
+                    </div>
+                    <div>
+                      <span class="badge ${s.class}"><i class="fas ${s.icon}"></i> ${s.label}</span>
+                      <strong style="color:var(--pizza-orange); font-size:16px; margin-left:12px;">R$ ${tot}</strong>
+                    </div>
+                  </div>
+
+                  ${order.itens_resumo ? `
+                    <div style="background:rgba(0,0,0,0.25); border-radius:var(--radius-sm); padding:10px 12px; margin-bottom:10px; font-size:13px; color:var(--text-primary);">
+                      <i class="fas fa-utensils" style="color:var(--pizza-orange); margin-right:6px;"></i>
+                      <strong>Itens:</strong> ${order.itens_resumo}
+                    </div>
+                  ` : ''}
+
+                  <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; color:var(--text-muted); flex-wrap:wrap; gap:8px;">
+                    <div>
+                      ${order.endereco_entrega ? `<span><i class="fas fa-map-marker-alt"></i> ${order.endereco_entrega}</span>` : ''}
+                      ${parseFloat(taxa) > 0 ? `<span style="margin-left:10px;"><i class="fas fa-motorcycle"></i> Taxa: R$ ${taxa}</span>` : ''}
+                      ${order.atendente ? `<span style="margin-left:10px;"><i class="fas fa-user-tag"></i> Atendente: ${order.atendente}</span>` : ''}
+                    </div>
+                    <button class="btn btn-sm btn-secondary" style="padding:4px 10px; font-size:11px;"
+                            onclick="reorderItems('${encodeURIComponent(order.itens_resumo || '')}', '${encodeURIComponent(order.cliente_nome || '')}', '${encodeURIComponent(order.cliente_telefone || '')}')">
+                      <i class="fas fa-redo"></i> Repetir Pedido
+                    </button>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+      } catch (err) {
+        container.innerHTML = `
+          <div style="text-align:center; padding:24px; color:var(--red);">
+            <i class="fas fa-exclamation-triangle" style="font-size:24px; margin-bottom:8px; display:block;"></i>
+            Erro ao carregar histórico: ${err.message}
+          </div>
+        `;
+      }
+    }
+
+    function reorderItems(itensEnc, nomeEnc, telEnc) {
+      const itens = decodeURIComponent(itensEnc);
+      const nome = decodeURIComponent(nomeEnc);
+      const tel = decodeURIComponent(telEnc);
+      closeClientDetail();
+      window.location.href = `pedidos.html?novo=1&nome=${encodeURIComponent(nome)}&tel=${encodeURIComponent(tel)}&itens=${encodeURIComponent(itens)}`;
+    }
+
     function viewClientDetail(id) {
       const c = allClients.find(item => item.id === id);
       if (!c) return;
+
+      activeCliId = id;
+      switchCliTab('dados');
 
       document.getElementById('detailCliId').textContent = '#' + c.id;
       document.getElementById('detailCliNome').textContent = c.nome || c.razao_social || '—';
@@ -511,6 +653,7 @@
       document.getElementById('detailCliBairro').textContent = c.bairro || '—';
       document.getElementById('detailCliCidade').textContent = [c.cidade, c.estado].filter(Boolean).join(' / ') || '—';
       document.getElementById('detailCliQtdPed').textContent = `${c.qtd_pedidos || 0} pedidos realizados`;
+      document.getElementById('badgeTotalPedCli').textContent = c.qtd_pedidos || 0;
       document.getElementById('detailCliConsumo').textContent = 'R$ ' + parseFloat(c.consumo_total || 0).toFixed(2).replace('.', ',');
       document.getElementById('detailCliObs').textContent = c.observacao || 'Nenhuma observação cadastrada.';
 
