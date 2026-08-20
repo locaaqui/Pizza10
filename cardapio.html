@@ -3,14 +3,16 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cardápio — Pizza10 | As Melhores Pizzas</title>
-  <meta name="description" content="Conheça o cardápio da Pizza10 — Pizzas artesanais, bebidas geladas e sobremesas irresistíveis. Faça seu pedido via WhatsApp!">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta name="theme-color" content="#0a0a0c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Cardápio Digital — Pizza 10 Itatiba | As Melhores Pizzas no Forno a Lenha</title>
+  <meta name="description" content="Conheça o cardápio da Pizza 10 Itatiba — Pizzas artesanais no forno a lenha, lanches, bebidas geladas e sobremesas irresistíveis. Peça online!">
   <meta name="robots" content="index, follow">
 
   <!-- Open Graph -->
-  <meta property="og:title" content="Cardápio — Pizza10">
-  <meta property="og:description" content="Pizzas artesanais premium com delivery. Confira nosso cardápio e peça pelo WhatsApp!">
+  <meta property="og:title" content="Cardápio Digital — Pizza 10 Itatiba">
+  <meta property="og:description" content="Pizzas artesanais forno a lenha. Confira nosso cardápio e faça seu pedido online!">
   <meta property="og:type" content="website">
 
   <!-- Favicon -->
@@ -24,33 +26,62 @@
   <!-- Pizza10 Styles -->
   <link rel="stylesheet" href="css/style.css">
 
-  <!-- Supabase (for loading dynamic menu) -->
+  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
 
+  <!-- TOP NOTICE BAR -->
+  <div class="top-notice-bar" id="topNoticeBar">
+    <span class="pulse-dot" id="topNoticeDot"></span>
+    <span id="topNoticeContent">🚀 <strong>CARDÁPIO DIGITAL INTERATIVO!</strong> Peça direto pelo Anota AI ou pelo WhatsApp com entrega rápida.</span>
+    <a href="https://app.anota.ai/pizza-10-2?utm_source=portal-share-btn" target="_blank" id="topTickerCta">
+      Abrir no Anota AI &rarr;
+    </a>
+  </div>
+
   <!-- PUBLIC HEADER -->
-  <header class="public-header">
-    <a href="cardapio.html" class="brand">
+  <header class="public-header" style="max-width: 1280px; margin: 0 auto;">
+    <a href="index.html" class="brand">
       <span class="brand-icon">🍕</span>
-      <h1>Pizza10</h1>
+      <div style="display:flex; flex-direction:column;">
+        <h1 style="margin:0; font-size:22px;">Pizza 10</h1>
+        <span style="font-size:11px; color:var(--pizza-gold); font-weight:600; text-transform:uppercase;">Itatiba • Forno a Lenha</span>
+      </div>
     </a>
     <div class="header-actions">
-      <a href="https://wa.me/5511999999999?text=Ol%C3%A1!%20Quero%20fazer%20um%20pedido!" target="_blank" class="btn btn-primary btn-sm">
-        <i class="fab fa-whatsapp"></i> Fazer Pedido
+      <a href="index.html" class="btn btn-secondary btn-sm">
+        <i class="fas fa-home"></i> Início
+      </a>
+      <a href="https://app.anota.ai/pizza-10-2?utm_source=portal-share-btn" target="_blank" class="btn btn-primary btn-sm">
+        <i class="fas fa-utensils"></i> Abrir App Completo
       </a>
     </div>
   </header>
 
   <!-- HERO -->
-  <section class="menu-hero">
-    <h1>Nosso Cardápio</h1>
-    <p>Pizzas artesanais feitas com ingredientes selecionados. Escolha sua favorita e peça agora!</p>
+  <section class="menu-hero" style="text-align:center; padding: 40px 20px 20px;">
+    <span class="section-eyebrow">🍕 Cardápio Selecionado</span>
+    <h1 style="font-family: var(--font-heading); font-size: 36px; font-weight: 800; margin: 10px 0;">Nossas Delícias Artesanais</h1>
+    <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto 20px;">
+      Pizzas feitas no forno a lenha com ingredientes frescos de altíssima qualidade. Escolha suas favoritas ou peça pelo nosso cardápio oficial!
+    </p>
+
+    <!-- Banner CTA -->
+    <div style="max-width: 700px; margin: 0 auto 30px; background: rgba(229,57,53,0.12); border: 1px solid rgba(229,57,53,0.3); border-radius: var(--radius); padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+      <div style="text-align: left;">
+        <strong style="color: #fff; font-size: 15px; display: block;">⚡ Deseja montar sua pizza meio a meio?</strong>
+        <span style="color: var(--text-secondary); font-size: 13px;">Acesse nosso sistema de pedidos no Anota AI com seleção completa de bordas e adicionais.</span>
+      </div>
+      <a href="https://app.anota.ai/pizza-10-2?utm_source=portal-share-btn" target="_blank" class="btn btn-primary btn-sm" style="white-space: nowrap;">
+        <i class="fas fa-external-link-alt"></i> Cardápio Interativo
+      </a>
+    </div>
   </section>
 
   <!-- CATEGORY TABS -->
-  <div class="menu-categories">
+  <div class="menu-categories" style="max-width: 1280px; margin: 0 auto 30px;">
     <button class="category-tab active" data-category="todos" onclick="filterCategory('todos')">
       🍕 Todos
     </button>
@@ -69,7 +100,7 @@
   </div>
 
   <!-- MENU GRID -->
-  <div class="menu-grid" id="menuGrid">
+  <div class="menu-grid" id="menuGrid" style="max-width: 1280px; margin: 0 auto 60px; padding: 0 20px;">
     <div class="page-loader" style="grid-column: 1 / -1;">
       <div class="spinner"></div>
       <p>Carregando cardápio…</p>
@@ -78,19 +109,27 @@
 
   <!-- FOOTER -->
   <footer class="app-footer">
-    <p>🍕 Pizza10 &copy; 2026 — As Melhores Pizzas da Região</p>
-    <p style="margin-top:6px;">
-      <a href="https://wa.me/5511999999999" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+    <p>🍕 <strong>Pizza 10 Itatiba</strong> &copy; 2026 &mdash; Forno a Lenha • Rua Atílio Lanfranchi, 91</p>
+    <p style="margin-top:8px;">
+      <a href="https://wa.me/5511972070747" target="_blank"><i class="fab fa-whatsapp"></i> (11) 97207-0747</a>
       &nbsp;•&nbsp;
-      <a href="index.html"><i class="fas fa-lock"></i> Área Admin</a>
+      <a href="https://app.anota.ai/pizza-10-2?utm_source=portal-share-btn" target="_blank"><i class="fas fa-utensils"></i> Cardápio Anota AI</a>
+      &nbsp;•&nbsp;
+      <a href="login.html"><i class="fas fa-lock"></i> Área Administrativa</a>
     </p>
   </footer>
 
-  <!-- WhatsApp Float -->
-  <a href="https://wa.me/5511999999999?text=Ol%C3%A1!%20Vi%20o%20card%C3%A1pio%20e%20quero%20fazer%20um%20pedido!"
-     target="_blank" class="whatsapp-float" title="Fazer pedido pelo WhatsApp">
-    <i class="fab fa-whatsapp"></i>
-  </a>
+  <!-- FLOATING WHATSAPP BUTTON WITH LIVE SPEECH BUBBLE -->
+  <div class="floating-wa-container">
+    <div class="wa-speech-bubble" id="waSpeechBubble">
+      <span>🍕 <strong>Peça pelo WhatsApp!</strong> Estamos online</span>
+    </div>
+    <a href="https://wa.me/5511972070747?text=Ol%C3%A1!%20Vi%20o%20card%C3%A1pio%20e%20quero%20fazer%20um%20pedido%20na%20Pizza%2010!"
+       target="_blank" class="wa-float-btn" id="waFloatBtn" title="Fazer pedido pelo WhatsApp">
+      <span class="wa-unread-badge"></span>
+      <i class="fab fa-whatsapp"></i>
+    </a>
+  </div>
 
   <!-- Scripts -->
   <script src="js/supabase-config.js"></script>
@@ -98,6 +137,70 @@
   <script>
     // Load menu on page ready
     loadMenu();
+
+    // Dynamic Live Opening Hours & Countdown Engine
+    function updateLiveStatus() {
+      const now = new Date();
+      const currentHour = now.getHours();
+      const isOpen = currentHour >= 18;
+
+      const topBar = document.getElementById('topNoticeBar');
+      const topDot = document.getElementById('topNoticeDot');
+      const topContent = document.getElementById('topNoticeContent');
+      const topCta = document.getElementById('topTickerCta');
+
+      const waBubble = document.getElementById('waSpeechBubble');
+      const waFloatBtn = document.getElementById('waFloatBtn');
+
+      if (isOpen) {
+        if (topBar) {
+          topBar.className = 'top-notice-bar is-open';
+          if (topDot) topDot.className = 'pulse-dot';
+          if (topContent) topContent.innerHTML = '🔥 <strong>FORNO A LENHA ACESO AGORA!</strong> Aceitando pedidos até 00h00 • Peça quentinha!';
+          if (topCta) topCta.innerHTML = 'Fazer Pedido &rarr;';
+        }
+        if (waBubble) {
+          waBubble.className = 'wa-speech-bubble is-open';
+          waBubble.innerHTML = '<span>🍕 <strong>Peça pelo WhatsApp!</strong> Estamos online</span>';
+        }
+        if (waFloatBtn) {
+          waFloatBtn.href = 'https://wa.me/5511972070747?text=' + encodeURIComponent('Olá! Vim pelo site da Pizza 10 e quero fazer um pedido!');
+        }
+      } else {
+        const targetOpen = new Date(now);
+        targetOpen.setHours(18, 0, 0, 0);
+
+        const diffMs = targetOpen.getTime() - now.getTime();
+        const totalSec = Math.max(0, Math.floor(diffMs / 1000));
+        const hours = Math.floor(totalSec / 3600);
+        const mins = Math.floor((totalSec % 3600) / 60);
+        const secs = totalSec % 60;
+
+        const hStr = String(hours).padStart(2, '0');
+        const mStr = String(mins).padStart(2, '0');
+        const sStr = String(secs).padStart(2, '0');
+        const countdownFormatted = `${hStr}h ${mStr}m ${sStr}s`;
+
+        if (topBar) {
+          topBar.className = 'top-notice-bar is-closed';
+          if (topDot) topDot.className = 'pulse-dot pulse-gold';
+          if (topContent) {
+            topContent.innerHTML = `⏰ <strong>FECHADO NO MOMENTO</strong> • Abrimos às 18h00 em <span class="countdown-badge"><i class="fas fa-clock"></i> ${countdownFormatted}</span> • Adiantar Pedido!`;
+          }
+          if (topCta) topCta.innerHTML = 'Abrir Anota AI &rarr;';
+        }
+        if (waBubble) {
+          waBubble.className = 'wa-speech-bubble is-closed';
+          waBubble.innerHTML = `<span>⏰ <strong>Abrimos às 18h</strong> • Agende seu pedido</span>`;
+        }
+        if (waFloatBtn) {
+          waFloatBtn.href = 'https://wa.me/5511972070747?text=' + encodeURIComponent('Olá! Sei que a pizzaria abre às 18h, mas gostaria de adiantar meu pedido!');
+        }
+      }
+    }
+
+    updateLiveStatus();
+    setInterval(updateLiveStatus, 1000);
   </script>
 
 </body>

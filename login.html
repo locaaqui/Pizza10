@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Pizza10 — Login Administrativo</title>
+  <meta name="description" content="Acesso ao sistema administrativo da Pizza10.">
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍕</text></svg>">
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <!-- Pizza10 Styles -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    .login-ambient {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .login-ambient .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.15;
+      animation: orbFloat 20s ease-in-out infinite;
+    }
+
+    .login-ambient .orb:nth-child(1) {
+      width: 400px;
+      height: 400px;
+      background: var(--pizza-red);
+      top: -100px;
+      left: -100px;
+      animation-delay: 0s;
+    }
+
+    .login-ambient .orb:nth-child(2) {
+      width: 300px;
+      height: 300px;
+      background: var(--pizza-orange);
+      bottom: -50px;
+      right: -50px;
+      animation-delay: -7s;
+    }
+
+    .login-ambient .orb:nth-child(3) {
+      width: 200px;
+      height: 200px;
+      background: var(--pizza-yellow);
+      top: 50%;
+      left: 60%;
+      animation-delay: -14s;
+    }
+
+    @keyframes orbFloat {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(30px, -40px) scale(1.1); }
+      50% { transform: translate(-20px, 30px) scale(0.95); }
+      75% { transform: translate(40px, 20px) scale(1.05); }
+    }
+
+    .back-home-link {
+      position: fixed;
+      top: 24px;
+      left: 24px;
+      z-index: 10;
+      color: var(--text-secondary);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      backdrop-filter: blur(10px);
+      transition: var(--transition-fast);
+    }
+    .back-home-link:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.1);
+      border-color: var(--border-hover);
+    }
+
+    .login-version {
+      position: fixed;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: var(--text-muted);
+      font-size: 12px;
+      z-index: 1;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Back to Home -->
+  <a href="index.html" class="back-home-link">
+    <i class="fas fa-arrow-left"></i> Voltar ao Site
+  </a>
+
+  <!-- Ambient Background -->
+  <div class="login-ambient">
+    <div class="orb"></div>
+    <div class="orb"></div>
+    <div class="orb"></div>
+  </div>
+
+  <!-- Login Page -->
+  <div class="login-page">
+    <div class="login-container">
+      <div class="login-card">
+
+        <!-- Logo -->
+        <div class="login-logo">
+          <span class="logo-icon">🍕</span>
+          <h1>Pizza10</h1>
+          <p>Painel Administrativo</p>
+        </div>
+
+        <!-- Login Form -->
+        <div class="login-form">
+          <div id="loginError" class="login-error"></div>
+
+          <div class="form-group">
+            <label for="loginName">Usuário</label>
+            <div class="input-wrapper">
+              <input type="text" id="loginName" placeholder="Nome ou e-mail" autocomplete="username">
+              <i class="fas fa-user"></i>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="loginPass">Senha</label>
+            <div class="input-wrapper">
+              <input type="password" id="loginPass" placeholder="Sua senha" autocomplete="current-password">
+              <i class="fas fa-lock"></i>
+            </div>
+          </div>
+
+          <button class="btn btn-primary" id="loginBtn" type="button">
+            <i class="fas fa-sign-in-alt"></i> Entrar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="login-version">Pizza10 Gestão &mdash; &copy; 2026</div>
+
+  <!-- Scripts -->
+  <script src="js/supabase-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    // Check if already logged in
+    (async () => {
+      await checkAuth(false);
+    })();
+
+    // Handle Enter key
+    document.getElementById('loginPass').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') document.getElementById('loginBtn').click();
+    });
+    document.getElementById('loginName').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') document.getElementById('loginPass').focus();
+    });
+
+    // Login button click
+    document.getElementById('loginBtn').addEventListener('click', async () => {
+      const name = document.getElementById('loginName').value.trim();
+      const pass = document.getElementById('loginPass').value;
+
+      if (!name || !pass) {
+        const err = document.getElementById('loginError');
+        err.style.display = 'block';
+        err.textContent = '⚠️ Preencha usuário e senha.';
+        return;
+      }
+
+      const btn = document.getElementById('loginBtn');
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Entrando…';
+      btn.disabled = true;
+
+      try {
+        await signIn(name, pass);
+        window.location.replace('admin-clientes.html');
+      } catch (error) {
+        const err = document.getElementById('loginError');
+        err.style.display = 'block';
+        err.textContent = '❌ ' + error.message;
+        btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
+        btn.disabled = false;
+      }
+    });
+  </script>
+
+</body>
+</html>

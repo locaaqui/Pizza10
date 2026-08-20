@@ -3,183 +3,807 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="robots" content="noindex, nofollow">
-  <title>Pizza10 — Login</title>
-  <meta name="description" content="Acesso ao sistema administrativo da Pizza10 — Pizzaria premium com delivery.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta name="theme-color" content="#0a0a0c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Pizza 10 Itatiba — A Verdadeira Pizza Artesanal no Forno a Lenha</title>
+  <meta name="description" content="A melhor pizza de Itatiba feita no autêntico forno a lenha. Massa crocante, recheios generosos e entrega rápida quentinha na sua casa. Peça pelo cardápio digital!">
+  <meta name="keywords" content="Pizza 10 Itatiba, Pizzaria em Itatiba, Delivery de Pizza Itatiba, Forno a Lenha Itatiba, Cardápio Pizza 10, Pedir Pizza Itatiba">
+  <meta name="robots" content="index, follow">
+
+  <!-- Open Graph / Social Media -->
+  <meta property="og:title" content="Pizza 10 Itatiba — Pizzaria Artesanal Forno a Lenha">
+  <meta property="og:description" content="Massa crocante, ingredientes nobres e muito queijo derretido. Peça online pelo nosso Cardápio Digital!">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://pizza10.com.br/">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=1200&q=85">
 
   <!-- Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍕</text></svg>">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍕</text></svg>">
 
-  <!-- Fonts & Icons -->
+  <!-- Fonts & FontAwesome -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
-  <!-- Pizza10 Styles -->
+  <!-- Styles -->
   <link rel="stylesheet" href="css/style.css">
-
-  <!-- Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <style>
-    /* Login page ambient effects */
-    .login-ambient {
-      position: fixed;
-      inset: 0;
-      overflow: hidden;
-      z-index: 0;
-    }
-
-    .login-ambient .orb {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(80px);
-      opacity: 0.15;
-      animation: orbFloat 20s ease-in-out infinite;
-    }
-
-    .login-ambient .orb:nth-child(1) {
-      width: 400px;
-      height: 400px;
-      background: var(--pizza-red);
-      top: -100px;
-      left: -100px;
-      animation-delay: 0s;
-    }
-
-    .login-ambient .orb:nth-child(2) {
-      width: 300px;
-      height: 300px;
-      background: var(--pizza-orange);
-      bottom: -50px;
-      right: -50px;
-      animation-delay: -7s;
-    }
-
-    .login-ambient .orb:nth-child(3) {
-      width: 200px;
-      height: 200px;
-      background: var(--pizza-yellow);
-      top: 50%;
-      left: 60%;
-      animation-delay: -14s;
-    }
-
-    @keyframes orbFloat {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      25% { transform: translate(30px, -40px) scale(1.1); }
-      50% { transform: translate(-20px, 30px) scale(0.95); }
-      75% { transform: translate(40px, 20px) scale(1.05); }
-    }
-
-    .login-version {
-      position: fixed;
-      bottom: 16px;
-      left: 50%;
-      transform: translateX(-50%);
-      color: var(--text-muted);
-      font-size: 12px;
-      z-index: 1;
-    }
-  </style>
 </head>
 
 <body>
 
-  <!-- Ambient Background -->
-  <div class="login-ambient">
-    <div class="orb"></div>
-    <div class="orb"></div>
-    <div class="orb"></div>
+  <!-- TOP TICKER / LIVE PROMO NOTICE -->
+  <div class="top-notice-bar" id="topNoticeBar">
+    <span class="pulse-dot" id="topNoticeDot"></span>
+    <span id="topNoticeContent">🔥 <strong>FORNO A LENHA ACESO EM ITATIBA!</strong> Peça pelo nosso Cardápio Digital Oficial e receba quentinha!</span>
+    <a href="https://app.anota.ai/pizza-10-2?utm_source=portal-share-btn" target="_blank" id="topTickerCta">
+      Abrir Cardápio &rarr;
+    </a>
   </div>
 
-  <!-- Login Page -->
-  <div class="login-page">
-    <div class="login-container">
-      <div class="login-card">
+  <!-- STICKY NAVBAR -->
+  <header class="landing-nav-wrapper" id="landingNavbar">
+    <div class="landing-nav">
+      
+      <!-- Brand Logo -->
+      <a href="index.html" class="brand-wrapper">
+        <span class="brand-logo-icon">🍕</span>
+        <div class="brand-text-col">
+          <h1>Pizza 10</h1>
+          <span class="brand-badge"><i class="fas fa-fire"></i> Forno a Lenha • Itatiba</span>
+        </div>
+      </a>
 
-        <!-- Logo -->
-        <div class="login-logo">
-          <span class="logo-icon">🍕</span>
-          <h1>Pizza10</h1>
-          <p>Sistema Administrativo</p>
+      <!-- Desktop Nav Links -->
+      <ul class="landing-menu-links" id="navLinks">
+        <li><a href="#inicio"><i class="fas fa-home"></i> Início</a></li>
+        <li><a href="#destaques"><i class="fas fa-star"></i> As Mais Pedidas</a></li>
+        <li><a href="#vibe-matcher"><i class="fas fa-magic"></i> Qual é a sua Vibe?</a></li>
+        <li><a href="#avaliacoes"><i class="fab fa-google"></i> Avaliações (4.6 ★)</a></li>
+        <li><a href="#localizacao"><i class="fas fa-map-marker-alt"></i> Onde Estamos</a></li>
+        <li>
+          <a href="https://app.anota.ai/pizza-10-2?utm_source=portal-share-btn" target="_blank" class="cardapio-highlight" id="navCardapioDigital">
+            <i class="fas fa-utensils"></i> Cardápio Digital
+          </a>
+        </li>
+      </ul>
+
+      <!-- Action Buttons -->
+      <div class="nav-actions">
+        <a href="https://wa.me/5511972070747?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Pizza%2010%20e%20quero%20fazer%20um%20pedido!"
+           target="_blank" class="btn-nav-whatsapp" title="Falar no WhatsApp">
+          <i class="fab fa-whatsapp"></i> (11) 97207-0747
+        </a>
+        <a href="https://app.anota.ai/pizza-10-2?utm_source=portal-share-btn" target="_blank" class="btn-cardapio-cta" id="headerCtaBtn">
+          <i class="fas fa-pizza-slice"></i> Fazer Pedido Online
+        </a>
+        <button class="mobile-menu-btn" id="mobileMenuToggle" aria-label="Abrir Menu">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- HERO SECTION -->
+  <section class="landing-hero" id="inicio">
+    <div class="hero-glow-back"></div>
+    <div class="hero-content-grid">
+      
+      <!-- Text & Value Prop -->
+      <div class="hero-text-col">
+        <div class="hero-status-pill" id="liveStatusPill">
+          <span class="pulse-dot" id="heroStatusDot"></span>
+          <span id="liveStatusText">🟢 Forno Aceso! Aceitando pedidos hoje das 18h às 00h</span>
         </div>
 
-        <!-- Login Form -->
-        <div class="login-form">
-          <div id="loginError" class="login-error"></div>
+        <h1 class="hero-title">
+          A Verdadeira Pizza no Forno a Lenha de Itatiba!
+          <span class="gradient-highlight">Crocante, Suculenta & Irresistível</span>
+        </h1>
 
-          <div class="form-group">
-            <label for="loginName">Usuário</label>
-            <div class="input-wrapper">
-              <input type="text" id="loginName" placeholder="Nome ou e-mail" autocomplete="username">
-              <i class="fas fa-user"></i>
-            </div>
+        <p class="hero-subtitle">
+          Massa artesanal de fermentação natural, molho de tomates frescos selecionados e uma generosidade incomparável no recheio com <strong>Catupiry® original</strong>. O sabor tradicional que conquistou Itatiba!
+        </p>
+
+        <!-- Authority Badges -->
+        <div class="hero-badges-row">
+          <div class="hero-badge-item">
+            <i class="fas fa-star"></i>
+            <span><strong>4.6</strong> no Google (+300 reviews)</span>
+          </div>
+          <div class="hero-badge-item">
+            <i class="fas fa-fire"></i>
+            <span><strong>100%</strong> Forno a Lenha</span>
+          </div>
+          <div class="hero-badge-item">
+            <i class="fas fa-motorcycle"></i>
+            <span>Entrega Rápida & Quentinha</span>
+          </div>
+        </div>
+
+        <!-- High-Impact Action Group -->
+        <div class="hero-cta-group">
+          <a href="https://app.anota.ai/pizza-10-2?utm_source=portal-share-btn" target="_blank" class="btn-hero-primary" id="heroMainCta">
+            <i class="fas fa-utensils"></i> ABRIR CARDÁPIO & PEDIR AGORA
+          </a>
+          <a href="https://wa.me/5511972070747?text=Ol%C3%A1!%20Vim%20pelo%20site%20e%20gostaria%20de%20fazer%20um%20pedido%20na%20Pizza%2010!"
+             target="_blank" class="btn-hero-whatsapp">
+            <i class="fab fa-whatsapp"></i> Pedir pelo WhatsApp
+          </a>
+        </div>
+      </div>
+
+      <!-- Hero Visual Showcase -->
+      <div class="hero-visual-col">
+        <div class="hero-visual-card">
+          <div class="floating-review-badge">
+            <i class="fas fa-award" style="color:var(--pizza-gold);"></i> 10/10 no Sabor
+          </div>
+          <div class="floating-delivery-badge">
+            <i class="fas fa-truck-fast"></i> Chega Fumegando
           </div>
 
-          <div class="form-group">
-            <label for="loginPass">Senha</label>
-            <div class="input-wrapper">
-              <input type="password" id="loginPass" placeholder="Sua senha" autocomplete="current-password">
-              <i class="fas fa-lock"></i>
-            </div>
+          <div class="pizza-glow-frame">
+            <img src="img/pizza-hero.jpg"
+                 alt="Pizza Artesanal Forno a Lenha Pizza 10 Itatiba"
+                 class="hero-pizza-img"
+                 onerror="this.src='img/pizza-calabresa.jpg'">
           </div>
 
-          <button class="btn btn-primary" id="loginBtn" type="button">
-            <i class="fas fa-sign-in-alt"></i> Entrar
-          </button>
+          <div class="hero-dish-info">
+            <h3>Pizzas Artesanais Especiais</h3>
+            <p>Feitas com amor, forno a lenha e ingredientes de primeira qualidade.</p>
+            <a href="https://app.anota.ai/pizza-10-2?utm_source=portal-share-btn" target="_blank" class="btn btn-primary btn-sm" style="width: 100%;">
+              <i class="fas fa-shopping-bag"></i> Ver Todas as Opções no Cardápio
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- STATS & SOCIAL PROOF STRIP -->
+  <section class="stats-strip-section">
+    <div class="stats-strip-grid">
+      <div class="stat-strip-card">
+        <i class="fas fa-pizza-slice"></i>
+        <div class="stat-strip-text">
+          <h4>+100.000</h4>
+          <p>Pizzas assadas com perfeição</p>
+        </div>
+      </div>
+      <div class="stat-strip-card">
+        <i class="fab fa-google"></i>
+        <div class="stat-strip-text">
+          <h4>4.6 Estrelas</h4>
+          <p>Avaliação média no Google</p>
+        </div>
+      </div>
+      <div class="stat-strip-card">
+        <i class="fas fa-fire-alt"></i>
+        <div class="stat-strip-text">
+          <h4>Forno a Lenha</h4>
+          <p>Tradição e sabor autêntico</p>
+        </div>
+      </div>
+      <div class="stat-strip-card">
+        <i class="fas fa-clock"></i>
+        <div class="stat-strip-text">
+          <h4>18h às 00h</h4>
+          <p>Aberto todos os dias em Itatiba</p>
         </div>
       </div>
     </div>
+  </section>
+
+  <!-- BEST SELLERS / AS MAIS PEDIDAS DE ITATIBA -->
+  <section class="landing-section" id="destaques">
+    <div class="section-head">
+      <span class="section-eyebrow">👑 Favoritas de Itatiba</span>
+      <h2>As Mais Pedidas da Pizza 10</h2>
+      <p>Pizzas que viraram lendas na cidade. Escolha a sua favorita e peça agora mesmo pelo nosso Cardápio Digital Oficial!</p>
+    </div>
+
+    <div class="pizzas-showcase-grid">
+
+      <!-- Pizza 1 -->
+      <div class="pizza-card">
+        <div class="pizza-card-img-wrapper">
+          <span class="card-tag">🏆 Campeã de Vendas</span>
+          <img src="img/pizza-calabresa.jpg" alt="Pizza Calabresa Especial" class="pizza-card-img" loading="lazy">
+        </div>
+        <div class="pizza-card-body">
+          <h3>Calabresa Especial Pizza 10</h3>
+          <p class="ingredients">Calabresa artesanal fatiada bem douradinha, fatias de cebola fresca, azeitonas pretas chilenas, orégano premium e um toque de molho rústico da casa.</p>
+          <div class="pizza-card-footer">
+            <a href="https://app.anota.ai/pizza-10-2?utm_source=portal-share-btn" target="_blank" class="btn-card-order" style="width: 100%; justify-content: center; padding: 12px 18px; font-size: 14px;">
+              <i class="fas fa-utensils"></i> Ver Opções & Pedir
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pizza 2 -->
+      <div class="pizza-card">
+        <div class="pizza-card-img-wrapper">
+          <span class="card-tag gold">🧀 Catupiry® Original</span>
+          <img src="img/pizza-frango-catupiry.jpg" alt="Pizza Frango com Catupiry" class="pizza-card-img" loading="lazy">
+        </div>
+        <div class="pizza-card-body">
+          <h3>Frango com Catupiry® Legitimo</h3>
+          <p class="ingredients">Peito de frango selecionado, desfiado e temperado na medida certa, generosamente coberto com o autêntico Catupiry® cremoso e milho verde.</p>
+          <div class="pizza-card-footer">
+            <a href="https://app.anota.ai/pizza-10-2?utm_source=portal-share-btn" target="_blank" class="btn-card-order" style="width: 100%; justify-content: center; padding: 12px 18px; font-size: 14px;">
+              <i class="fas fa-utensils"></i> Ver Opções & Pedir
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pizza 3 -->
+      <div class="pizza-card">
+        <div class="pizza-card-img-wrapper">
+          <span class="card-tag">⭐ Puro Queijo</span>
+          <img src="img/pizza-quatro-queijos.jpg" alt="Pizza Quatro Queijos" class="pizza-card-img" loading="lazy">
+        </div>
+        <div class="pizza-card-body">
+          <h3>Quatro Queijos Nobres</h3>
+          <p class="ingredients">Combinação harmônica de Mozzarella derretida, Provolone defumado, Gorgonzola aromático e requeijão Catupiry cremoso na massa crocante.</p>
+          <div class="pizza-card-footer">
+            <a href="https://app.anota.ai/pizza-10-2?utm_source=portal-share-btn" target="_blank" class="btn-card-order" style="width: 100%; justify-content: center; padding: 12px 18px; font-size: 14px;">
+              <i class="fas fa-utensils"></i> Ver Opções & Pedir
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pizza 4 -->
+      <div class="pizza-card">
+        <div class="pizza-card-img-wrapper">
+          <span class="card-tag">👑 Suprema</span>
+          <img src="img/pizza-portuguesa.jpg" alt="Pizza Portuguesa Tradicional" class="pizza-card-img" loading="lazy">
+        </div>
+        <div class="pizza-card-body">
+          <h3>Portuguesa Tradicional</h3>
+          <p class="ingredients">Presunto magro em cubos, ovos cozidos fatiados, ervilha fresca, cebola, azeitonas, palmito macio e cobertura farta de mozzarella derretida.</p>
+          <div class="pizza-card-footer">
+            <a href="https://app.anota.ai/pizza-10-2?utm_source=portal-share-btn" target="_blank" class="btn-card-order" style="width: 100%; justify-content: center; padding: 12px 18px; font-size: 14px;">
+              <i class="fas fa-utensils"></i> Ver Opções & Pedir
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pizza 5 -->
+      <div class="pizza-card">
+        <div class="pizza-card-img-wrapper">
+          <span class="card-tag gold">🥩 Especial da Casa</span>
+          <img src="img/pizza-picanha.jpg" alt="Pizza de Picanha Especial" class="pizza-card-img" loading="lazy">
+        </div>
+        <div class="pizza-card-body">
+          <h3>Picanha na Lenha com Alho Crispy</h3>
+          <p class="ingredients">Tiras suculentas de picanha grelhada, queijo mozzarella derretido, alho frito crocante e molho de ervas finas assado no forno a lenha.</p>
+          <div class="pizza-card-footer">
+            <a href="https://app.anota.ai/pizza-10-2?utm_source=portal-share-btn" target="_blank" class="btn-card-order" style="width: 100%; justify-content: center; padding: 12px 18px; font-size: 14px;">
+              <i class="fas fa-utensils"></i> Ver Opções & Pedir
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pizza 6 -->
+      <div class="pizza-card">
+        <div class="pizza-card-img-wrapper">
+          <span class="card-tag sweet">🍫 Sobremesa Irresistível</span>
+          <img src="img/pizza-nutella-morango.jpg" alt="Pizza Doce Nutella com Morangos" class="pizza-card-img" loading="lazy">
+        </div>
+        <div class="pizza-card-body">
+          <h3>Vulcão de Nutella & Morangos</h3>
+          <p class="ingredients">Massa leve e crocante coberta com muita Nutella original cremosa, fatias de morangos frescos e raspas de chocolate branco.</p>
+          <div class="pizza-card-footer">
+            <a href="https://app.anota.ai/pizza-10-2?utm_source=portal-share-btn" target="_blank" class="btn-card-order" style="width: 100%; justify-content: center; padding: 12px 18px; font-size: 14px;">
+              <i class="fas fa-utensils"></i> Ver Opções & Pedir
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- View All Button -->
+    <div style="text-align: center;">
+      <a href="https://app.anota.ai/pizza-10-2?utm_source=portal-share-btn" target="_blank" class="btn btn-primary" style="font-size: 16px; padding: 14px 32px;">
+        <i class="fas fa-utensils"></i> VER CARDÁPIO COMPLETO COM TODAS AS PIZZAS, LANCHES & BEBIDAS &rarr;
+      </a>
+    </div>
+  </section>
+
+  <!-- INTERACTIVE VIBE / FLAVOR MATCHER (VIRAL FEATURE) -->
+  <section class="landing-section" id="vibe-matcher" style="padding-top: 20px;">
+    <div class="vibe-matcher-card">
+      <div class="section-head" style="margin-bottom: 24px;">
+        <span class="section-eyebrow">🍕 Simulador de Fome</span>
+        <h2>Qual é a sua vibe para a noite de hoje?</h2>
+        <p>Clique no seu momento e descubra a combinação perfeita que chega quentinha na sua casa:</p>
+      </div>
+
+      <div class="vibe-options-grid">
+        <button class="vibe-btn active" onclick="selectVibe('filme', this)">
+          <span class="vibe-icon">🎬</span>
+          <span class="vibe-title">Noite de Cinema / Série</span>
+          <span class="vibe-desc">Para maratonar no sofá sem sujar louça</span>
+        </button>
+
+        <button class="vibe-btn" onclick="selectVibe('familia', this)">
+          <span class="vibe-icon">👨‍👩‍👧‍👦</span>
+          <span class="vibe-title">Reunião em Família</span>
+          <span class="vibe-desc">Agrada desde a criançada até os avós</span>
+        </button>
+
+        <button class="vibe-btn" onclick="selectVibe('amigos', this)">
+          <span class="vibe-icon">🍻</span>
+          <span class="vibe-title">Galera & Amigos</span>
+          <span class="vibe-desc">Pizzas bem recheadas para dividir com cerveja gelada</span>
+        </button>
+
+        <button class="vibe-btn" onclick="selectVibe('doce', this)">
+          <span class="vibe-icon">🍫</span>
+          <span class="vibe-title">Vontade Louca de Doce</span>
+          <span class="vibe-desc">Aquele momento de pura indulgência e chocolate</span>
+        </button>
+      </div>
+
+      <div class="vibe-result-box" id="vibeResultBox">
+        <div>
+          <h4 id="vibeResultTitle" style="font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 4px;">
+            🎬 Sugestão: 1 Pizza Calabresa Especial + 1 Coca-Cola 2L Gelada!
+          </h4>
+          <p id="vibeResultDesc" style="color: var(--text-secondary); font-size: 14px; margin: 0;">
+            A combinação que nunca erra para relaxar assistindo sua série favorita.
+          </p>
+        </div>
+        <a href="https://app.anota.ai/pizza-10-2?utm_source=portal-share-btn" target="_blank" class="btn btn-primary" id="vibeResultBtn">
+          <i class="fas fa-shopping-cart"></i> Pedir Esta Combinação
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- GOOGLE REVIEWS & PRESENÇA LOCAL SECTION -->
+  <section class="landing-section" id="avaliacoes">
+    <div class="google-reviews-card">
+      
+      <!-- Rating Header -->
+      <div class="google-rating-header">
+        <div class="google-brand-col">
+          <div class="google-icon-box">
+            <i class="fab fa-google"></i>
+          </div>
+          <div>
+            <h3 style="font-size: 22px; font-weight: 800; color: #fff; margin-bottom: 4px;">Pizza 10 Itatiba no Google</h3>
+            <p style="color: var(--text-secondary); font-size: 13px; margin: 0;">Avaliações reais de clientes verificados de Itatiba e região</p>
+          </div>
+        </div>
+
+        <div class="google-score-col">
+          <div class="big-rating-number">4.6</div>
+          <div>
+            <div class="stars-row">
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star-half-alt"></i>
+            </div>
+            <span style="font-size: 13px; color: var(--text-muted); font-weight: 600;">+320 avaliações de clientes</span>
+          </div>
+        </div>
+
+        <div>
+          <a href="https://www.google.com/search?q=pizza+10+itatiba" target="_blank" class="btn btn-secondary btn-sm">
+            <i class="fab fa-google"></i> Ver no Google
+          </a>
+        </div>
+      </div>
+
+      <!-- Real Reviews Cards -->
+      <div class="reviews-grid">
+
+        <div class="review-card">
+          <div class="review-author-row">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div class="review-avatar">MS</div>
+              <div>
+                <div class="review-name">Mariana Silveira</div>
+                <div class="review-time">Cliente Frequente • Itatiba</div>
+              </div>
+            </div>
+            <div class="stars-row" style="font-size: 12px;">
+              <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+            </div>
+          </div>
+          <p class="review-text">
+            "Sem dúvidas a melhor pizza de Itatiba! A massa assada no forno a lenha é super leve, borda crocante e o recheio é muito caprichado. Pedimos toda sexta pelo cardápio e chega sempre quentinha!"
+          </p>
+        </div>
+
+        <div class="review-card">
+          <div class="review-author-row">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div class="review-avatar">CE</div>
+              <div>
+                <div class="review-name">Carlos Eduardo Mendes</div>
+                <div class="review-time">Avaliação Google 5★</div>
+              </div>
+            </div>
+            <div class="stars-row" style="font-size: 12px;">
+              <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+            </div>
+          </div>
+          <p class="review-text">
+            "O Frango com Catupiry deles é surreal. Catupiry original de verdade, sem miséria de recheio. O atendimento pelo WhatsApp e pelo cardápio online é rápido e sem enrolação. Recomendo 100%!"
+          </p>
+        </div>
+
+        <div class="review-card">
+          <div class="review-author-row">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div class="review-avatar">FR</div>
+              <div>
+                <div class="review-name">Fernanda Ribeiro</div>
+                <div class="review-time">Avaliação Google 5★</div>
+              </div>
+            </div>
+            <div class="stars-row" style="font-size: 12px;">
+              <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+            </div>
+          </div>
+          <p class="review-text">
+            "Pizza maravilhosa! A doce de Nutella com morangos é um espetáculo à parte. Entrega ágil na Vila Bela Vista. Já virou tradição dos fins de semana aqui em casa."
+          </p>
+        </div>
+
+        <div class="review-card">
+          <div class="review-author-row">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div class="review-avatar">TB</div>
+              <div>
+                <div class="review-name">Thiago Barbosa</div>
+                <div class="review-time">Avaliação Google 5★</div>
+              </div>
+            </div>
+            <div class="stars-row" style="font-size: 12px;">
+              <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+            </div>
+          </div>
+          <p class="review-text">
+            "Massa fininha e crocante, molho de tomate natural e forno a lenha legítimo. Pizza 10 faz jus ao nome nota 10. Parabéns a toda a equipe pelo padrão de qualidade!"
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- LOCAL PRESENCE & MAPS SECTION -->
+  <section class="landing-section" id="localizacao">
+    <div class="section-head">
+      <span class="section-eyebrow">📍 Onde Estamos em Itatiba</span>
+      <h2>Venha nos Conhecer ou Peça em Casa</h2>
+      <p>Localização privilegiada na Vila Bela Vista com atendimento para retirada no balcão e delivery para todos os bairros de Itatiba!</p>
+    </div>
+
+    <div class="location-section-grid">
+      
+      <!-- Info Card -->
+      <div class="location-info-card">
+        <div>
+          <!-- Address -->
+          <div class="info-item-block">
+            <i class="fas fa-map-marker-alt"></i>
+            <div>
+              <h4>Endereço Completo</h4>
+              <p>Rua Atílio Lanfranchi, 91 &mdash; Vila Bela Vista<br>Itatiba - SP, CEP 13253-120</p>
+            </div>
+          </div>
+
+          <!-- Opening Hours -->
+          <div class="info-item-block">
+            <i class="fas fa-clock"></i>
+            <div>
+              <h4>Horário de Atendimento</h4>
+              <p><strong>Segunda a Domingo:</strong> 18h00 às 00h00<br><span style="color:var(--green); font-weight:600;">Aberto todos os dias sem exceção!</span></p>
+            </div>
+          </div>
+
+          <!-- Telephones -->
+          <div class="info-item-block">
+            <i class="fas fa-phone-alt"></i>
+            <div>
+              <h4>Canais de Contato e Pedidos</h4>
+              <div class="phones-pills-row">
+                <a href="https://wa.me/5511972070747" target="_blank" class="phone-pill" style="border-color: rgba(37,211,102,0.4); color:#25d366;">
+                  <i class="fab fa-whatsapp"></i> (11) 97207-0747
+                </a>
+                <a href="tel:1145341010" class="phone-pill">
+                  <i class="fas fa-phone"></i> (11) 4534-1010
+                </a>
+                <a href="tel:1145343026" class="phone-pill">
+                  <i class="fas fa-phone"></i> (11) 4534-3026
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Delivery Areas -->
+          <div class="info-item-block" style="margin-bottom: 0;">
+            <i class="fas fa-shipping-fast"></i>
+            <div>
+              <h4>Área de Entrega</h4>
+              <p>Entregamos com agilidade em toda a cidade de Itatiba (Vila Bela Vista, Centro, Jardim Salessi, Alto de Fátima, San Martin, etc.).</p>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top: 24px; display: flex; gap: 12px; flex-wrap: wrap;">
+          <a href="https://maps.google.com/?q=Pizza+10+Itatiba+Rua+Atilio+Lanfranchi+91" target="_blank" class="btn btn-secondary" style="flex:1;">
+            <i class="fas fa-directions"></i> Traçar Rota no Google Maps
+          </a>
+          <a href="https://app.anota.ai/pizza-10-2?utm_source=portal-share-btn" target="_blank" class="btn btn-primary" style="flex:1;">
+            <i class="fas fa-utensils"></i> Pedir pelo Cardápio
+          </a>
+        </div>
+      </div>
+
+      <!-- Google Maps Embed -->
+      <div class="map-container-frame">
+        <iframe
+          src="https://maps.google.com/maps?q=Pizza%2010%20Rua%20Atilio%20Lanfranchi%2091%20Itatiba%20SP&t=&z=16&ie=UTF8&iwloc=&output=embed"
+          width="100%"
+          height="100%"
+          style="border:0;"
+          allowfullscreen=""
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          title="Localização da Pizza 10 em Itatiba">
+        </iframe>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- MEGA CONVERSION CTA BANNER -->
+  <section class="landing-section" style="padding-top: 0;">
+    <div class="mega-cta-banner">
+      <h2>Bateu aquela fome de pizza de verdade? 🍕</h2>
+      <p>Não perca tempo! Peça agora em menos de 2 minutos pelo nosso Cardápio Digital Oficial e receba no conforto da sua casa quentinha e crocante.</p>
+      
+      <div class="mega-cta-actions">
+        <a href="https://app.anota.ai/pizza-10-2?utm_source=portal-share-btn" target="_blank" class="btn-hero-primary" style="font-size: 19px; padding: 18px 36px;" id="megaCtaBtn">
+          <i class="fas fa-pizza-slice"></i> ACESSAR CARDÁPIO DIGITAL OFICIAL
+        </a>
+        <a href="https://wa.me/5511972070747?text=Ol%C3%A1!%20Gostaria%20de%20fazer%20um%20pedido%20pelo%20WhatsApp!" target="_blank" class="btn-hero-whatsapp">
+          <i class="fab fa-whatsapp"></i> Chamar no WhatsApp
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="app-footer">
+    <div style="max-width: 1280px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 16px;">
+      
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 28px;">🍕</span>
+        <span style="font-family: var(--font-heading); font-size: 22px; font-weight: 800; color: #fff;">Pizza 10 Itatiba</span>
+      </div>
+
+      <p style="color: var(--text-secondary); max-width: 500px; margin: 0; font-size: 13.5px;">
+        A verdadeira pizza artesanal no forno a lenha. Tradição, qualidade e carinho em cada fatia para Itatiba e região.
+      </p>
+
+      <div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; font-size: 14px; margin-top: 8px;">
+        <a href="https://app.anota.ai/pizza-10-2?utm_source=portal-share-btn" target="_blank" style="color:var(--pizza-gold); font-weight: 700;">
+          <i class="fas fa-utensils"></i> Cardápio Digital
+        </a>
+        <a href="https://wa.me/5511972070747" target="_blank" style="color:#25d366;">
+          <i class="fab fa-whatsapp"></i> (11) 97207-0747
+        </a>
+        <a href="https://www.instagram.com/pizza_10itatiba/" target="_blank" style="color:#e1306c;">
+          <i class="fab fa-instagram"></i> @pizza_10itatiba
+        </a>
+        <a href="https://maps.google.com/?q=Pizza+10+Itatiba+Rua+Atilio+Lanfranchi+91" target="_blank" style="color:var(--blue);">
+          <i class="fas fa-map-marker-alt"></i> Rua Atílio Lanfranchi, 91
+        </a>
+      </div>
+
+      <div style="border-top: 1px solid var(--border-subtle); width: 100%; max-width: 600px; margin-top: 16px; padding-top: 16px; font-size: 12px; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <span>Pizza 10 &copy; 2026 &mdash; Todos os direitos reservados.</span>
+        <a href="login.html" style="color: var(--text-muted); text-decoration: none; font-size: 11px;">
+          <i class="fas fa-lock"></i> Acesso Administrativo
+        </a>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- FLOATING WHATSAPP BUTTON WITH LIVE SPEECH BUBBLE -->
+  <div class="floating-wa-container">
+    <div class="wa-speech-bubble" id="waSpeechBubble">
+      <span>🍕 <strong>Peça pelo WhatsApp!</strong> Estamos online</span>
+    </div>
+    <a href="https://wa.me/5511972070747?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Pizza%2010%20e%20gostaria%20de%20fazer%20um%20pedido!"
+       target="_blank" class="wa-float-btn" id="waFloatBtn" title="Falar no WhatsApp">
+      <span class="wa-unread-badge" id="waUnreadBadge"></span>
+      <i class="fab fa-whatsapp"></i>
+    </a>
   </div>
 
-  <div class="login-version">Pizza10 v1.0 &mdash; &copy; 2026</div>
+  <!-- MOBILE STICKY BOTTOM ORDER BAR (HIGH CONVERTING ON PHONES) -->
+  <div class="mobile-bottom-bar">
+    <a href="https://app.anota.ai/pizza-10-2?utm_source=portal-share-btn" target="_blank" class="mobile-btn-cardapio" id="mobileBottomCardapio">
+      <i class="fas fa-utensils"></i> Cardápio Digital
+    </a>
+    <a href="https://wa.me/5511972070747?text=Ol%C3%A1!%20Quero%20fazer%20um%20pedido!" target="_blank" class="mobile-btn-whatsapp" id="mobileBottomWa">
+      <i class="fab fa-whatsapp"></i> WhatsApp
+    </a>
+  </div>
 
-  <!-- Scripts -->
-  <script src="js/supabase-config.js"></script>
-  <script src="js/auth.js"></script>
+  <!-- INTERACTIVE SCRIPTS -->
   <script>
-    // Check if already logged in
-    (async () => {
-      await checkAuth(false); // false = this is the login page
-    })();
-
-    // Handle Enter key
-    document.getElementById('loginPass').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') document.getElementById('loginBtn').click();
-    });
-    document.getElementById('loginName').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') document.getElementById('loginPass').focus();
-    });
-
-    // Login button click
-    document.getElementById('loginBtn').addEventListener('click', async () => {
-      const name = document.getElementById('loginName').value.trim();
-      const pass = document.getElementById('loginPass').value;
-
-      if (!name || !pass) {
-        const err = document.getElementById('loginError');
-        err.style.display = 'block';
-        err.textContent = '⚠️ Preencha usuário e senha.';
-        return;
-      }
-
-      const btn = document.getElementById('loginBtn');
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Entrando…';
-      btn.disabled = true;
-
-      try {
-        await signIn(name, pass);
-        window.location.replace('admin-clientes.html');
-      } catch (error) {
-        const err = document.getElementById('loginError');
-        err.style.display = 'block';
-        err.textContent = '❌ ' + error.message;
-        btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
-        btn.disabled = false;
+    // Navbar scroll effect
+    window.addEventListener('scroll', () => {
+      const nav = document.getElementById('landingNavbar');
+      if (window.scrollY > 40) {
+        nav.classList.add('scrolled');
+      } else {
+        nav.classList.remove('scrolled');
       }
     });
+
+    // Mobile menu toggle
+    const menuBtn = document.getElementById('mobileMenuToggle');
+    const navLinks = document.getElementById('navLinks');
+    if (menuBtn && navLinks) {
+      menuBtn.addEventListener('click', () => {
+        navLinks.classList.toggle('show');
+      });
+      // Close on link click
+      navLinks.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+          navLinks.classList.remove('show');
+        });
+      });
+    }
+
+    // Dynamic Live Opening Hours & Real-time Countdown Engine (Google Hours: 18h00 - 00h00)
+    function updateLiveStatus() {
+      const now = new Date();
+      const currentHour = now.getHours();
+
+      // Operating Hours: 18:00 to 23:59:59
+      const isOpen = currentHour >= 18;
+
+      const topBar = document.getElementById('topNoticeBar');
+      const topDot = document.getElementById('topNoticeDot');
+      const topContent = document.getElementById('topNoticeContent');
+      const topCta = document.getElementById('topTickerCta');
+
+      const heroPill = document.getElementById('liveStatusPill');
+      const heroDot = document.getElementById('heroStatusDot');
+      const heroText = document.getElementById('liveStatusText');
+
+      const waBubble = document.getElementById('waSpeechBubble');
+      const waFloatBtn = document.getElementById('waFloatBtn');
+
+      if (isOpen) {
+        // --- STORE OPEN ---
+        if (topBar) {
+          topBar.className = 'top-notice-bar is-open';
+          if (topDot) topDot.className = 'pulse-dot';
+          if (topContent) topContent.innerHTML = '🔥 <strong>FORNO A LENHA ACESO AGORA!</strong> Aceitando pedidos hoje até 00h00 • Peça quentinha!';
+          if (topCta) topCta.innerHTML = 'Fazer Pedido &rarr;';
+        }
+        if (heroPill) {
+          heroPill.style.borderColor = 'rgba(34, 197, 94, 0.4)';
+          if (heroDot) heroDot.className = 'pulse-dot';
+          if (heroText) heroText.innerHTML = '🟢 <strong>FORNO ACESO AGORA!</strong> Aceitando pedidos para entrega rápida até 00h00';
+        }
+        if (waBubble) {
+          waBubble.className = 'wa-speech-bubble is-open';
+          waBubble.innerHTML = '<span>🍕 <strong>Peça pelo WhatsApp!</strong> Estamos online</span>';
+        }
+        if (waFloatBtn) {
+          waFloatBtn.href = 'https://wa.me/5511972070747?text=' + encodeURIComponent('Olá! Vim pelo site da Pizza 10 e quero fazer um pedido!');
+        }
+      } else {
+        // --- STORE CLOSED: COUNTDOWN UNTIL 18:00 TODAY ---
+        const targetOpen = new Date(now);
+        targetOpen.setHours(18, 0, 0, 0);
+
+        const diffMs = targetOpen.getTime() - now.getTime();
+        const totalSec = Math.max(0, Math.floor(diffMs / 1000));
+        const hours = Math.floor(totalSec / 3600);
+        const mins = Math.floor((totalSec % 3600) / 60);
+        const secs = totalSec % 60;
+
+        const hStr = String(hours).padStart(2, '0');
+        const mStr = String(mins).padStart(2, '0');
+        const sStr = String(secs).padStart(2, '0');
+        const countdownFormatted = `${hStr}h ${mStr}m ${sStr}s`;
+
+        if (topBar) {
+          topBar.className = 'top-notice-bar is-closed';
+          if (topDot) topDot.className = 'pulse-dot pulse-gold';
+          if (topContent) {
+            topContent.innerHTML = `⏰ <strong>FECHADO AGORA</strong> • Abrimos às 18h00 em <span class="countdown-badge"><i class="fas fa-clock"></i> ${countdownFormatted}</span> • Adiantar Pedido!`;
+          }
+          if (topCta) topCta.innerHTML = 'Ver Cardápio &rarr;';
+        }
+        if (heroPill) {
+          heroPill.style.borderColor = 'rgba(245, 158, 11, 0.4)';
+          if (heroDot) heroDot.className = 'pulse-dot pulse-gold';
+          if (heroText) {
+            heroText.innerHTML = `⏰ <strong>ABRINDO EM ${countdownFormatted}</strong> (às 18h00) • Agende pelo Cardápio Digital`;
+          }
+        }
+        if (waBubble) {
+          waBubble.className = 'wa-speech-bubble is-closed';
+          waBubble.innerHTML = `<span>⏰ <strong>Abrimos às 18h</strong> • Agende seu pedido</span>`;
+        }
+        if (waFloatBtn) {
+          waFloatBtn.href = 'https://wa.me/5511972070747?text=' + encodeURIComponent('Olá! Sei que a pizzaria abre às 18h, mas gostaria de adiantar meu pedido!');
+        }
+      }
+    }
+
+    // Run immediately and update every second in real-time
+    updateLiveStatus();
+    setInterval(updateLiveStatus, 1000);
+
+    // Vibe Matcher Data & Selection
+    const vibeData = {
+      filme: {
+        title: '🎬 Sugestão: 1 Pizza Calabresa Especial + 1 Coca-Cola 2L Gelada!',
+        desc: 'A combinação perfeita para maratonar sem interrupção no sofá.',
+        link: 'https://app.anota.ai/pizza-10-2?utm_source=portal-share-btn'
+      },
+      familia: {
+        title: '👨‍👩‍👧‍👦 Sugestão: 1 Portuguesa Suprema + 1 Frango com Catupiry® + 1 Pizza Doce de Nutella!',
+        desc: 'O combo supremo que agrada dos netos aos avós na mesa de jantar.',
+        link: 'https://app.anota.ai/pizza-10-2?utm_source=portal-share-btn'
+      },
+      amigos: {
+        title: '🍻 Sugestão: 1 Quatro Queijos Nobres + 1 Picanha na Lenha com Alho Crispy + Cervejas!',
+        desc: 'Pizzas encorpadas e recheadíssimas para brindar com a galera.',
+        link: 'https://app.anota.ai/pizza-10-2?utm_source=portal-share-btn'
+      },
+      doce: {
+        title: '🍫 Sugestão: 1 Vulcão de Nutella & Morangos com borda recheada!',
+        desc: 'Pura felicidade em formato de pizza doce artesanal irresistível.',
+        link: 'https://app.anota.ai/pizza-10-2?utm_source=portal-share-btn'
+      }
+    };
+
+    function selectVibe(key, btnElement) {
+      document.querySelectorAll('.vibe-btn').forEach(btn => btn.classList.remove('active'));
+      if (btnElement) btnElement.classList.add('active');
+
+      const data = vibeData[key];
+      if (!data) return;
+
+      const titleEl = document.getElementById('vibeResultTitle');
+      const descEl = document.getElementById('vibeResultDesc');
+      const linkEl = document.getElementById('vibeResultBtn');
+
+      if (titleEl) titleEl.textContent = data.title;
+      if (descEl) descEl.textContent = data.desc;
+      if (linkEl) linkEl.href = data.link;
+    }
   </script>
 
 </body>

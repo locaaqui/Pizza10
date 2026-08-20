@@ -14,7 +14,7 @@ async function checkAuth(isProtectedPage = true) {
     const session = data?.session;
 
     if (isProtectedPage && !session) {
-      window.location.replace('index.html');
+      window.location.replace('login.html');
       return null;
     }
 
@@ -31,7 +31,7 @@ async function checkAuth(isProtectedPage = true) {
   } catch (err) {
     console.error('Auth check failed:', err);
     if (isProtectedPage) {
-      window.location.replace('index.html');
+      window.location.replace('login.html');
     }
     return null;
   }
@@ -71,7 +71,7 @@ async function signIn(nameOrEmail, password) {
  */
 async function signOut() {
   await sb.auth.signOut();
-  window.location.replace('index.html');
+  window.location.replace('login.html');
 }
 
 /**
