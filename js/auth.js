@@ -19,7 +19,7 @@ async function checkAuth(isProtectedPage = true) {
     }
 
     if (!isProtectedPage && session) {
-      window.location.replace('dashboard.html');
+      window.location.replace('admin-clientes.html');
       return session;
     }
 
