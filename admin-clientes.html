@@ -188,6 +188,70 @@
     .detail-section-title i {
       color: var(--pizza-orange);
     }
+
+    /* Export Dropdown Styles */
+    .dropdown-export {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-export .btn-export {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: var(--text-primary);
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: var(--transition-fast);
+    }
+
+    .dropdown-export .btn-export:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 110%;
+      background-color: #1e1e24; /* Fallback to a dark color if bg-panel missing */
+      background-color: var(--bg-panel, #1e1e24);
+      min-width: 220px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
+      z-index: 100;
+      border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.15));
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+
+    .dropdown-content.show {
+      display: block;
+    }
+
+    .dropdown-content a {
+      color: var(--text-primary);
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      font-size: 13px;
+      transition: background-color 0.2s;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .dropdown-content a:last-child {
+      border-bottom: none;
+    }
+
+    .dropdown-content a:hover {
+      background-color: rgba(255, 111, 0, 0.1);
+      color: var(--pizza-orange);
+    }
   </style>
 
   <!-- Supabase -->
@@ -234,9 +298,23 @@
           Consulta e gestão da base histórica de clientes • <span id="totalClientsCount">Carregando…</span>
         </p>
       </div>
-      <button class="btn btn-primary" onclick="openNewClientModal()">
-        <i class="fas fa-user-plus"></i> Novo Cliente
-      </button>
+      <div style="display:flex; gap:12px; align-items:center; flex-wrap: wrap;">
+        <div class="dropdown-export">
+          <button class="btn-export" onclick="toggleExportDropdown()">
+            <i class="fas fa-file-excel" style="color: #21a366;"></i> Exportar
+          </button>
+          <div class="dropdown-content" id="exportDropdown">
+            <a href="#" onclick="exportClientsCSV(1); return false;"><i class="fas fa-download"></i> Parte 1 (1 - 10.000)</a>
+            <a href="#" onclick="exportClientsCSV(2); return false;"><i class="fas fa-download"></i> Parte 2 (10.001 - 20.000)</a>
+            <a href="#" onclick="exportClientsCSV(3); return false;"><i class="fas fa-download"></i> Parte 3 (20.001 - 30.000)</a>
+            <a href="#" onclick="exportClientsCSV(4); return false;"><i class="fas fa-download"></i> Parte 4 (30.001 - 40.000)</a>
+            <a href="#" onclick="exportClientsCSV(5); return false;"><i class="fas fa-download"></i> Parte 5 (40.001+)</a>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="openNewClientModal()">
+          <i class="fas fa-user-plus"></i> Novo Cliente
+        </button>
+      </div>
     </div>
 
     <!-- Search & Filter Bar -->
@@ -539,6 +617,105 @@
     })();
 
     document.getElementById('logoutBtn').addEventListener('click', signOut);
+
+    // Export Dropdown Logic
+    function toggleExportDropdown() {
+      document.getElementById("exportDropdown").classList.toggle("show");
+    }
+
+    // Close the dropdown if the user clicks outside of it
+    window.onclick = function(event) {
+      if (!event.target.closest('.dropdown-export')) {
+        var dropdowns = document.getElementsByClassName("dropdown-content");
+        for (var i = 0; i < dropdowns.length; i++) {
+          var openDropdown = dropdowns[i];
+          if (openDropdown.classList.contains('show')) {
+            openDropdown.classList.remove('show');
+          }
+        }
+      }
+    }
+
+    function generateCSVContent(data) {
+      // Definir cabeçalho
+      const header = ["ID", "Nome", "Telefones", "CPF_CNPJ", "Endereco", "Numero", "Complemento", "Bairro", "Cidade", "CEP", "Consumo_Total", "Qtd_Pedidos", "Observacoes"];
+      
+      const escapeCSV = (str) => {
+        if (str === null || str === undefined) return '""';
+        let cleanStr = String(str).replace(/"/g, '""');
+        return `"${cleanStr}"`;
+      };
+
+      const rows = data.map(c => {
+        const telefones = Array.isArray(c.telefones) ? c.telefones.join('; ') : (c.telefone_principal || '');
+        return [
+          c.id,
+          c.nome,
+          telefones,
+          c.documento,
+          c.endereco,
+          c.numero,
+          c.complemento,
+          c.bairro,
+          c.cidade,
+          c.cep,
+          c.consumo_total,
+          c.qtd_pedidos,
+          c.observacoes
+        ].map(escapeCSV).join(',');
+      });
+
+      return [header.join(','), ...rows].join('\n');
+    }
+
+    async function exportClientsCSV(part) {
+      toggleExportDropdown(); // close dropdown
+      const btnExport = document.querySelector('.btn-export');
+      const originalText = btnExport.innerHTML;
+      btnExport.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Baixando...';
+      btnExport.disabled = true;
+
+      try {
+        const pageSize = 10000;
+        const from = (part - 1) * pageSize;
+        const to = from + pageSize - 1;
+
+        const { data, error } = await sb
+          .from(CLIENTS_TABLE)
+          .select('*')
+          .order('id', { ascending: false })
+          .range(from, to);
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+          showToast(`A Parte ${part} não possui registros para exportar.`, "warning");
+          return;
+        }
+
+        const csvContent = generateCSVContent(data);
+        
+        // BOM for Excel compatibility with UTF-8
+        const blob = new Blob(["\\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `clientes-pizza10-parte${part}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        showToast(`Download da Parte ${part} iniciado com sucesso!`, "success");
+
+      } catch (err) {
+        console.error("Erro ao exportar parte", part, err);
+        showToast("Erro ao exportar. Tente novamente.", "error");
+      } finally {
+        btnExport.innerHTML = originalText;
+        btnExport.disabled = false;
+      }
+    }
 
     async function loadClientsTotalCount() {
       try {
